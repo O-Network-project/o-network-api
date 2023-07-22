@@ -22,4 +22,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('/organizations')->group(function () {
     Route::get('/', [OrganizationController::class, 'index'])->name('organizations');
     Route::get('/{organization}', [OrganizationController::class, 'show'])->name('organization');
+    Route::post('/', [OrganizationController::class, 'store'])->name('create_organization');
 });

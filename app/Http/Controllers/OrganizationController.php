@@ -29,7 +29,7 @@ class OrganizationController extends Controller
      */
     public function store(StoreOrganizationRequest $request)
     {
-        //
+        return new OrganizationResource(Organization::create($request->all()));
     }
 
     /**
