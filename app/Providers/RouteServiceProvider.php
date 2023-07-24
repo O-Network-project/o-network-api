@@ -47,6 +47,10 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
         });
+
+        // The organization ID must be an integer; it avoids bad URL matching,
+        // like /organizations/foo, and so unnecessary database requests
+        Route::pattern('organization', '[0-9]+');
     }
 
     /**
