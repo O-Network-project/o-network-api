@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\OrganizationResource;
 use App\Http\Requests\StoreOrganizationRequest;
 use App\Http\Requests\UpdateOrganizationRequest;
+use App\Http\Requests\ValidateOrganizationRequest;
 
 class OrganizationController extends Controller
 {
@@ -31,6 +32,21 @@ class OrganizationController extends Controller
     public function store(StoreOrganizationRequest $request)
     {
         return new OrganizationResource(Organization::create($request->all()));
+    }
+
+    /**
+     * Validate the organization without storing it.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function check(ValidateOrganizationRequest $request)
+    {
+        $name = $request->input('name');
+        $conflicts = Organization::where('name', $name)->exists();
+
+        if ($conflicts)
+            return response()->json(['message' => "The organization '$name' already exists."], 409);
     }
 
     /**
