@@ -24,4 +24,5 @@ Route::prefix('/organizations')->group(function () {
     Route::get('/{organization}', [OrganizationController::class, 'show'])->name('organization');
     Route::post('/', [OrganizationController::class, 'store'])->name('create_organization');
     Route::patch('/{organization}', [OrganizationController::class, 'update'])->name('update_organization');
+    Route::delete('/{organization}', [OrganizationController::class, 'destroy'])->name('delete_organization');
 });
