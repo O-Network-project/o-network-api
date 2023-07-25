@@ -21,7 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix('/organizations')->group(function () {
     Route::get('/', [OrganizationController::class, 'index'])->name('organizations');
-    Route::get('/validate', [OrganizationController::class, 'check'])->name('validate_organization');
+    Route::get('/validation', [OrganizationController::class, 'check'])->name('validate_organization');
     Route::get('/{organization}', [OrganizationController::class, 'show'])->name('organization');
     Route::post('/', [OrganizationController::class, 'store'])->name('create_organization');
     Route::patch('/{organization}', [OrganizationController::class, 'update'])->name('update_organization');
