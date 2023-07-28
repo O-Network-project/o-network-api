@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\OrganizationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\OrganizationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,8 +23,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('/organizations')->group(function () {
     Route::get('/', [OrganizationController::class, 'index'])->name('organizations');
     Route::get('/validation', [OrganizationController::class, 'check'])->name('validate_organization');
-    Route::get('/{organization}', [OrganizationController::class, 'show'])->name('organization');
+
+    Route::prefix('/{organization}')->group(function () {
+        Route::get('/', [OrganizationController::class, 'show'])->name('organization');
+        Route::patch('/', [OrganizationController::class, 'update'])->name('update_organization');
+        Route::delete('/', [OrganizationController::class, 'destroy'])->name('delete_organization');
+    });
+
     Route::post('/', [OrganizationController::class, 'store'])->name('create_organization');
-    Route::patch('/{organization}', [OrganizationController::class, 'update'])->name('update_organization');
-    Route::delete('/{organization}', [OrganizationController::class, 'destroy'])->name('delete_organization');
 });
