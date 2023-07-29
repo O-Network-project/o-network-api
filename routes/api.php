@@ -26,9 +26,15 @@ Route::prefix('/organizations')->group(function () {
 
     Route::prefix('/{organization}')->group(function () {
         Route::get('/', [OrganizationController::class, 'show'])->name('organization');
+        Route::get('/users', [UserController::class, 'showOrganizationUsers'])->name('organization_users');
         Route::patch('/', [OrganizationController::class, 'update'])->name('update_organization');
         Route::delete('/', [OrganizationController::class, 'destroy'])->name('delete_organization');
     });
 
     Route::post('/', [OrganizationController::class, 'store'])->name('create_organization');
+});
+
+Route::prefix('/users')->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('users');
+    Route::get('/{user}', [UserController::class, 'show'])->name('user');
 });
