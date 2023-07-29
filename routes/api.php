@@ -37,4 +37,5 @@ Route::prefix('/organizations')->group(function () {
 Route::prefix('/users')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('users');
     Route::get('/{user}', [UserController::class, 'show'])->name('user');
+    Route::post('/', [UserController::class, 'store'])->name('create_user');
 });
