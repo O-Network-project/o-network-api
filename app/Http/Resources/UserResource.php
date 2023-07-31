@@ -21,7 +21,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'surname' => $this->surname,
             'job' => $this->job,
-            'profilePicture' => $this->profile_picture,
+            'profilePicture' => $this->profile_picture ? route('profile_picture', ['user' => $this->id]) : null,
             'disabled' => $this->disabled,
             'organizationId' => $this->organization_id,
             'role' => $this->role

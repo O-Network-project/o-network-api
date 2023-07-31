@@ -9,6 +9,7 @@ use App\Http\Resources\UserResource;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -108,5 +109,26 @@ class UserController extends Controller
         $fileName = $file->hashName();
         $file->store('profiles-pictures', ['disk' => 'public']);
         return $fileName;
+    }
+
+    /**
+     * Return the profile picture of the the provided user as a binary file.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function showProfilePicture(User $user)
+    {
+        if (!$user->profile_picture) {
+            return response(null, 404);
+        }
+
+        $path = "/profiles-pictures/$user->profile_picture";
+
+        if (!Storage::disk('public')->exists($path)) {
+            return response(null, 404);
+        }
+
+        return response()->file(Storage::disk('public')->path($path));
     }
 }
