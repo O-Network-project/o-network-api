@@ -42,5 +42,6 @@ Route::prefix('/users')->group(function () {
         Route::get('/', [UserController::class, 'show'])->name('user');
         Route::get('/profile-picture', [UserController::class, 'showProfilePicture'])->name('profile_picture');
         Route::patch('/', [UserController::class, 'update'])->name('update_user');
+        Route::post('/session', [UserController::class, 'login'])->name('login');
     });
 });
