@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\Organization;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 
 class UserController extends Controller
@@ -80,9 +80,17 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $inputs = $request->all();
+
+        if ($request->hasFile('profilePicture')) {
+            Storage::disk('public')->delete("/profiles-pictures/$user->profile_picture");
+            $inputs['profile_picture'] = $this->storeProfilePicture($request->file('profilePicture'));
+        }
+
+        $user->update($inputs);
+        return new UserResource($user);
     }
 
     /**
