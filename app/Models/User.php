@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,9 +17,13 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
         'email',
+        'name',
+        'surname',
         'password',
+        'job',
+        'profile_picture',
+        'organization_id'
     ];
 
     /**
@@ -29,16 +32,24 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password'
     ];
 
     /**
-     * The attributes that should be cast.
+     * Default values of the User model attributes.
      *
-     * @var array<string, string>
+     * @var array
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
+    protected $attributes = [
+        'disabled' => false,
+        'role_id' => 1
     ];
+
+    public function organization() {
+        return $this->belongsTo(Organization::class);
+    }
+
+    public function role() {
+        return $this->belongsTo(Role::class);
+    }
 }

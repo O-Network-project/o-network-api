@@ -46,8 +46,14 @@ class Handler extends ExceptionHandler
 
             // We need to check if a route matched first, to avoid returning
             // "Organization not found" for every request with a bad URL
-            if ($request->route() && $request->is('api/organizations/*')) {
-                $message = "Organization record not found.";
+            if ($request->route()) {
+                if ($request->is('api/organizations/*')) {
+                    $message = "Organization record not found.";
+                }
+
+                if ($request->is('api/users/*')) {
+                    $message = "User record not found.";
+                }
             }
 
             return response()->json(['message' => $message], 404);
