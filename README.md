@@ -25,6 +25,12 @@ And in the newly created folder, install the Composer dependencies:
 composer install
 ```
 
+Create also the app key with the following command:
+
+```bash
+php artisan key:generate
+```
+
 Now create a new database (`o_network` for example) with the following command (don't forget to set the desired user instead of `root` if needed):
 
 ```bash
