@@ -48,10 +48,10 @@ DB_USERNAME=root
 DB_PASSWORD=root
 ```
 
-Finally, populate the database with the migrations:
+Finally, populate the database with the migrations and seed data:
 
 ```bash
-php artisan migrate
+php artisan migrate --seed
 ```
 
 Now and every time you need to run the project, launch the following command to start the server:
