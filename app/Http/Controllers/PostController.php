@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostCollection;
 use App\Http\Resources\PostResource;
 use App\Models\Organization;
@@ -89,12 +90,22 @@ class PostController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post)
+    public function update(UpdatePostRequest $request, Organization $organization, Post $post)
     {
-        //
+        // If the post is not in this organization, it's considered as not found
+        if ($post->author->organization_id !== $organization->id) {
+            return abort(404);
+        }
+
+        if (Auth::user()->organization_id !== $organization->id) {
+            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
+        }
+
+        $post->update($request->all());
     }
 
     /**

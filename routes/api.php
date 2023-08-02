@@ -41,6 +41,7 @@ Route::prefix('/organizations')->group(function () {
 
             Route::prefix('/{post}')->group(function () {
                 Route::get('/', [PostController::class, 'show'])->name('post');
+                Route::patch('/', [PostController::class, 'update'])->name('update_post');
             });
         });
     });
