@@ -114,8 +114,17 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Post $post)
+    public function destroy(Organization $organization, Post $post)
     {
-        //
+        // If the post is not in this organization, it's considered as not found
+        if ($post->author->organization_id !== $organization->id) {
+            return abort(404);
+        }
+
+        if (Auth::user()->organization_id !== $organization->id) {
+            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
+        }
+
+        $post->delete();
     }
 }
