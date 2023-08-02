@@ -38,14 +38,14 @@ Route::prefix('/users')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('users');
     Route::post('/', [UserController::class, 'store'])->name('create_user');
 
+    Route::prefix('/session')->group(function () {
+        Route::post('/', [UserController::class, 'login'])->name('login');
+        Route::delete('/', [UserController::class, 'logout'])->name('logout');
+    });
+
     Route::prefix('/{user}')->group(function () {
         Route::get('/', [UserController::class, 'show'])->name('user');
         Route::get('/profile-picture', [UserController::class, 'showProfilePicture'])->name('profile_picture');
         Route::patch('/', [UserController::class, 'update'])->name('update_user');
-
-        Route::prefix('/session')->group(function () {
-            Route::post('/', [UserController::class, 'login'])->name('login');
-            Route::delete('/', [UserController::class, 'logout'])->name('logout');
-        });
     });
 });
