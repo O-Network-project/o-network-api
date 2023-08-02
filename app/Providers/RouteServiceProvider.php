@@ -52,6 +52,7 @@ class RouteServiceProvider extends ServiceProvider
         // like /organizations/foo, and so unnecessary database requests
         Route::pattern('organization', '[0-9]+');
         Route::pattern('user', '[0-9]+');
+        Route::pattern('post', '[0-9]+');
     }
 
     /**

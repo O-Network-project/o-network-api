@@ -1,0 +1,96 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Resources\PostCollection;
+use App\Http\Resources\PostResource;
+use App\Models\Organization;
+use App\Models\Post;
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class PostController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     * @param  \App\Models\Organization  $organization
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Organization $organization)
+    {
+        return new PostCollection(Post::
+            join('users', 'posts.author_id', '=', 'users.id')
+            ->where('users.organization_id', $organization->id)
+            ->select('posts.*')
+            ->get()
+        );
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Organization  $organization
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Organization $organization, Post $post)
+    {
+        // If the post is not in this organization, it's considered as not found
+        if ($post->author->organization_id !== $organization->id) {
+            return abort(404);
+        }
+
+        return new PostResource($post);
+    }
+
+    /**
+     * Return the posts of a specific user.
+     *
+     * @param  \App\Models\Organization  $organization
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function showUserPosts(Organization $organization, User $user)
+    {
+        // If the user is not in this organization, it's considered as not found
+        if ($user->organization_id !== $organization->id) {
+            return abort(404);
+        }
+
+        return new PostCollection(Post::where('author_id', $user->id)->get());
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Post $post)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Post $post)
+    {
+        //
+    }
+}
