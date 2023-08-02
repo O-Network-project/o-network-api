@@ -16,9 +16,10 @@ class OrganizationSeeder extends Seeder
     public function run()
     {
         Organization::factory()
-            ->count(5)
-            ->has(User::factory()->admin()->count(1))
-            ->hasUsers(20)
+            ->count(2)
+            ->has(User::factory()->admin()->count(1)->hasPosts(3))
+            ->has(User::factory()->count(10)->hasPosts(3))
+            ->has(User::factory()->count(5))
             ->create()
         ;
 
