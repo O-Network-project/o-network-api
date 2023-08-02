@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePostRequest;
 use App\Http\Resources\PostCollection;
 use App\Http\Resources\PostResource;
 use App\Models\Organization;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -29,12 +31,24 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      *
+     * @param  \App\Models\Organization  $organization
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Organization $organization, StorePostRequest $request)
     {
-        //
+        $user = Auth::user();
+
+        if ($user->organization_id !== $organization->id) {
+            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
+        }
+
+        $post = new Post();
+        $post->fill($request->all());
+        $post->author_id = $user->id;
+        $post->save();
+
+        return new PostResource($post);
     }
 
     /**
