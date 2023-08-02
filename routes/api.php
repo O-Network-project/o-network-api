@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrganizationController;
+use App\Http\Controllers\PostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,9 +27,24 @@ Route::prefix('/organizations')->group(function () {
 
     Route::prefix('/{organization}')->group(function () {
         Route::get('/', [OrganizationController::class, 'show'])->name('organization');
-        Route::get('/users', [UserController::class, 'showOrganizationUsers'])->name('organization_users');
         Route::patch('/', [OrganizationController::class, 'update'])->name('update_organization');
         Route::delete('/', [OrganizationController::class, 'destroy'])->name('delete_organization');
+
+        Route::prefix('/users')->group(function () {
+            Route::get('/', [UserController::class, 'showOrganizationUsers'])->name('organization_users');
+            Route::get('/{user}/posts', [PostController::class, 'showUserPosts'])->name('users_post');
+        });
+
+        Route::prefix('/posts')->group(function () {
+            Route::get('/', [PostController::class, 'index'])->name('posts');
+            Route::post('/', [PostController::class, 'store'])->name('create_post');
+
+            Route::prefix('/{post}')->group(function () {
+                Route::get('/', [PostController::class, 'show'])->name('post');
+                Route::patch('/', [PostController::class, 'update'])->name('update_post');
+                Route::delete('/', [PostController::class, 'destroy'])->name('delete_post');
+            });
+        });
     });
 
     Route::post('/', [OrganizationController::class, 'store'])->name('create_organization');
