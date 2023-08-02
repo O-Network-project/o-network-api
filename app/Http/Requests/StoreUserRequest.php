@@ -40,7 +40,7 @@ class StoreUserRequest extends FormRequest
         $this->merge([
             'password' => Hash::make($this->password),
             'profile_picture' => $this->profilePicture,
-            'organization_id' => $this->organizationId
+            'organization_id' => (int) $this->organizationId
         ]);
     }
 }
