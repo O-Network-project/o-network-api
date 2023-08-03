@@ -35,6 +35,10 @@ class User extends Authenticatable
         'password'
     ];
 
+    protected $casts = [
+        'disabled' => 'boolean',
+    ];
+
     /**
      * Default values of the User model attributes.
      *
