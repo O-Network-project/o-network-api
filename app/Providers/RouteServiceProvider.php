@@ -47,6 +47,12 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
         });
+
+        // The entities IDs must be integers; it avoids bad URL matching,
+        // like /organizations/foo, and so unnecessary database requests
+        Route::pattern('organization', '[0-9]+');
+        Route::pattern('user', '[0-9]+');
+        Route::pattern('post', '[0-9]+');
     }
 
     /**
