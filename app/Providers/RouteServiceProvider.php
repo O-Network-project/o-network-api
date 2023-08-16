@@ -53,6 +53,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::pattern('organization', '[0-9]+');
         Route::pattern('user', '[0-9]+');
         Route::pattern('post', '[0-9]+');
+        Route::pattern('comment', '[0-9]+');
     }
 
     /**
