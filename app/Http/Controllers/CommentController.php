@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCommentRequest;
 use App\Http\Resources\CommentCollection;
 use App\Models\Post;
 use App\Models\Comment;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Http\Resources\CommentResource;
+use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
@@ -26,12 +28,31 @@ class CommentController extends Controller
     /**
      * Store a newly created resource in storage.
      *
+     * @param  \App\Models\Organization  $organization
+     * @param  \App\Models\Post  $post
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Organization $organization, Post $post, StoreCommentRequest $request)
     {
-        //
+        $user = Auth::user();
+
+        // If the post is not in this organization, it's considered as not found
+        if ($post->author->organization_id !== $organization->id) {
+            return abort(404);
+        }
+
+        if ($user->organization_id !== $organization->id) {
+            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
+        }
+
+        $comment = new Comment();
+        $comment->fill($request->all());
+        $comment->author_id = $user->id;
+        $comment->post_id = $post->id;
+        $comment->save();
+
+        return new CommentResource($comment);
     }
 
     /**

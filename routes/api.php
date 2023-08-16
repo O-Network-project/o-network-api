@@ -42,9 +42,13 @@ Route::prefix('/organizations')->group(function () {
 
             Route::prefix('/{post}')->group(function () {
                 Route::get('/', [PostController::class, 'show'])->name('post');
-                Route::get('/comments', [CommentController::class, 'showPostComments'])->name('post_comments');
                 Route::patch('/', [PostController::class, 'update'])->name('update_post');
                 Route::delete('/', [PostController::class, 'destroy'])->name('delete_post');
+
+                Route::prefix('/comments')->group(function () {
+                    Route::get('/', [CommentController::class, 'showPostComments'])->name('post_comments');
+                    Route::post('/', [CommentController::class, 'store'])->name('create_comment');
+                });
             });
         });
 
