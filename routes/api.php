@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -43,6 +44,21 @@ Route::prefix('/organizations')->group(function () {
                 Route::get('/', [PostController::class, 'show'])->name('post');
                 Route::patch('/', [PostController::class, 'update'])->name('update_post');
                 Route::delete('/', [PostController::class, 'destroy'])->name('delete_post');
+
+                Route::prefix('/comments')->group(function () {
+                    Route::get('/', [CommentController::class, 'showPostComments'])->name('post_comments');
+                    Route::post('/', [CommentController::class, 'store'])->name('create_comment');
+                });
+            });
+        });
+
+        Route::prefix('/comments')->group(function () {
+            Route::get('/', [CommentController::class, 'index'])->name('comments');
+
+            Route::prefix('/{comment}')->group(function () {
+                Route::get('/', [CommentController::class, 'show'])->name('comment');
+                Route::patch('/', [CommentController::class, 'update'])->name('update_comment');
+                Route::delete('/', [CommentController::class, 'destroy'])->name('delete_comment');
             });
         });
     });

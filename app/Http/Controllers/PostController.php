@@ -21,12 +21,7 @@ class PostController extends Controller
      */
     public function index(Organization $organization)
     {
-        return new PostCollection(Post::
-            join('users', 'posts.author_id', '=', 'users.id')
-            ->where('users.organization_id', $organization->id)
-            ->select('posts.*')
-            ->get()
-        );
+        return new PostCollection($organization->posts);
     }
 
     /**

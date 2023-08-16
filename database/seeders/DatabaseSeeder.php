@@ -24,7 +24,10 @@ class DatabaseSeeder extends Seeder
         // pollution.
         if (!App::environment('production')) {
             $this->call([
-                OrganizationSeeder::class
+                OrganizationSeeder::class,
+                UserSeeder::class,
+                PostSeeder::class,
+                CommentSeeder::class
             ]);
         }
     }

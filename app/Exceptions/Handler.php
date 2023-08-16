@@ -55,6 +55,10 @@ class Handler extends ExceptionHandler
                     $message = "Post record not found.";
                 }
 
+                if ($request->is('api/organizations/*/comments/*')) {
+                    $message = "Comment record not found.";
+                }
+
                 if ($request->is('api/users/*') || $request->is('api/organizations/*/users/*')) {
                     $message = "User record not found.";
                 }
