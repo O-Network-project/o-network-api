@@ -83,7 +83,7 @@ class PostController extends Controller
             return abort(404);
         }
 
-        return new PostCollection(Post::where('author_id', $user->id)->get());
+        return new PostCollection($user->posts);
     }
 
     /**
