@@ -118,11 +118,22 @@ class CommentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Comment $comment)
+    public function destroy(Organization $organization, Comment $comment)
     {
-        //
+        // If the comment is not in this organization, it's considered as not
+        // found
+        if ($comment->author->organization_id !== $organization->id) {
+            return abort(404);
+        }
+
+        if (Auth::user()->organization_id !== $organization->id) {
+            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
+        }
+
+        $comment->delete();
     }
 }
