@@ -57,6 +57,7 @@ Route::prefix('/organizations')->group(function () {
 
             Route::prefix('/{comment}')->group(function () {
                 Route::get('/', [CommentController::class, 'show'])->name('comment');
+                Route::patch('/', [CommentController::class, 'update'])->name('update_comment');
             });
         });
     });
