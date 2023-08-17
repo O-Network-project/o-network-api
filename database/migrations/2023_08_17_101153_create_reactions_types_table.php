@@ -1,5 +1,6 @@
 <?php
 
+use Database\Seeders\ReactionTypeSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,6 +19,11 @@ class CreateReactionsTypesTable extends Migration
             $table->string('tag', 5)->unique();
             $table->string('name', 10)->unique();
         });
+
+        // As reactions types are not example data, this seeder is not run from
+        // the DatabaseSeeder but directly here, after the creation of the table
+        $seeder = new ReactionTypeSeeder();
+        $seeder->run();
     }
 
     /**
