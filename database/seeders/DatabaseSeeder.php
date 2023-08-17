@@ -14,21 +14,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // Mandatory and permanent data. Needed for the app to work properly in
-        // any environment.
-        $this->call([
-            RoleSeeder::class
-        ]);
-
         // Example data. Must not be generated in production to avoid database
         // pollution.
-        if (!App::environment('production')) {
-            $this->call([
-                OrganizationSeeder::class,
-                UserSeeder::class,
-                PostSeeder::class,
-                CommentSeeder::class
-            ]);
-        }
+        $this->call([
+            OrganizationSeeder::class,
+            UserSeeder::class,
+            PostSeeder::class,
+            CommentSeeder::class
+        ]);
     }
 }
