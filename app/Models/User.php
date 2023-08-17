@@ -23,7 +23,8 @@ class User extends Authenticatable
         'password',
         'job',
         'profile_picture',
-        'organization_id'
+        'organization_id',
+        'disabled',
     ];
 
     /**

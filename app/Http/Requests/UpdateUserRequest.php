@@ -38,6 +38,7 @@ class UpdateUserRequest extends FormRequest
             'profilePicture' => ['sometimes', 'nullable', 'file', 'image', 'dimensions:min_width=128,min_height=128'],
             'organizationId' => ['prohibited'],
             'organization_id' => ['prohibited'],
+            'disabled' => ['sometimes', 'required', 'boolean'],
         ];
     }
 
