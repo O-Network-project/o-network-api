@@ -20,7 +20,8 @@ class DatabaseSeeder extends Seeder
             OrganizationSeeder::class,
             UserSeeder::class,
             PostSeeder::class,
-            CommentSeeder::class
+            CommentSeeder::class,
+            ReactionSeeder::class
         ]);
     }
 }
