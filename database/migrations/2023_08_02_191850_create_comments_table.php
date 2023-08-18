@@ -22,8 +22,7 @@ class CreateCommentsTable extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->unsignedBigInteger('author_id');
-            $table->foreign('author_id')
+            $table->foreignId('author_id')
                 ->references('id')->on('users')
                 ->cascadeOnDelete();
         });
