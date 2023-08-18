@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ReactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,11 @@ Route::prefix('/organizations')->group(function () {
                     Route::get('/', [CommentController::class, 'showPostComments'])->name('post_comments');
                     Route::post('/', [CommentController::class, 'store'])->name('create_comment');
                 });
+
+                Route::prefix('/reactions')->group(function () {
+                    Route::get('/', [ReactionController::class, 'showPostReactions'])->name('post_reactions');
+                    Route::post('/', [ReactionController::class, 'store'])->name('create_reaction');
+                });
             });
         });
 
@@ -59,6 +65,16 @@ Route::prefix('/organizations')->group(function () {
                 Route::get('/', [CommentController::class, 'show'])->name('comment');
                 Route::patch('/', [CommentController::class, 'update'])->name('update_comment');
                 Route::delete('/', [CommentController::class, 'destroy'])->name('delete_comment');
+            });
+        });
+
+        Route::prefix('/reactions')->group(function () {
+            Route::get('/', [ReactionController::class, 'index'])->name('reactions');
+
+            Route::prefix('/{reaction}')->group(function () {
+                Route::get('/', [ReactionController::class, 'show'])->name('reaction');
+                Route::patch('/', [ReactionController::class, 'update'])->name('update_reaction');
+                Route::delete('/', [ReactionController::class, 'destroy'])->name('delete_reaction');
             });
         });
     });
