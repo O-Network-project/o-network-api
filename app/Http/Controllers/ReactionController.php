@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreReactionRequest;
 use App\Http\Resources\ReactionCollection;
 use App\Models\Post;
 use App\Models\Reaction;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\ReactionResource;
 
 class ReactionController extends Controller
@@ -26,12 +28,31 @@ class ReactionController extends Controller
     /**
      * Store a newly created resource in storage.
      *
+     * @param  \App\Models\Organization  $organization
+     * @param  \App\Models\Post  $post
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Organization $organization, Post $post, StoreReactionRequest $request)
     {
-        //
+        $user = Auth::user();
+
+        // If the post is not in this organization, it's considered as not found
+        if ($post->author->organization_id !== $organization->id) {
+            return abort(404);
+        }
+
+        if ($user->organization_id !== $organization->id) {
+            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
+        }
+
+        $reaction = new Reaction();
+        $reaction->fill($request->all());
+        $reaction->author_id = $user->id;
+        $reaction->post_id = $post->id;
+        $reaction->save();
+
+        return new ReactionResource($reaction);
     }
 
     /**

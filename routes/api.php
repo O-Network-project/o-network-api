@@ -53,6 +53,7 @@ Route::prefix('/organizations')->group(function () {
 
                 Route::prefix('/reactions')->group(function () {
                     Route::get('/', [ReactionController::class, 'showPostReactions'])->name('post_reactions');
+                    Route::post('/', [ReactionController::class, 'store'])->name('create_reaction');
                 });
             });
         });
