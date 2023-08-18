@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreReactionRequest;
+use App\Http\Requests\UpdateReactionRequest;
 use App\Http\Resources\ReactionCollection;
 use App\Models\Post;
 use App\Models\Reaction;
@@ -95,12 +96,24 @@ class ReactionController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Reaction  $reaction
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Reaction $reaction)
+    public function update(UpdateReactionRequest $request, Organization $organization, Reaction $reaction)
     {
-        //
+        // If the reaction is not in this organization, it's considered as not
+        // found
+        if ($reaction->author->organization_id !== $organization->id) {
+            return abort(404);
+        }
+
+        if (Auth::user()->organization_id !== $organization->id) {
+            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
+        }
+
+        $reaction->update($request->all());
+        return new ReactionResource($reaction);
     }
 
     /**

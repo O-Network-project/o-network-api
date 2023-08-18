@@ -73,6 +73,7 @@ Route::prefix('/organizations')->group(function () {
 
             Route::prefix('/{reaction}')->group(function () {
                 Route::get('/', [ReactionController::class, 'show'])->name('reaction');
+                Route::patch('/', [ReactionController::class, 'update'])->name('update_reaction');
             });
         });
     });
