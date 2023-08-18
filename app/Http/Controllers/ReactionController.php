@@ -119,11 +119,22 @@ class ReactionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Reaction  $reaction
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Reaction $reaction)
+    public function destroy(Organization $organization, Reaction $reaction)
     {
-        //
+        // If the reaction is not in this organization, it's considered as not
+        // found
+        if ($reaction->author->organization_id !== $organization->id) {
+            return abort(404);
+        }
+
+        if (Auth::user()->organization_id !== $organization->id) {
+            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
+        }
+
+        $reaction->delete();
     }
 }
