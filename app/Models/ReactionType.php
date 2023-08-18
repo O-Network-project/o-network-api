@@ -22,4 +22,8 @@ class ReactionType extends Model
      * @var bool
      */
     public $timestamps = false;
+
+    public function reactions() {
+        return $this->hasMany(Reaction::class, 'type_id');
+    }
 }
