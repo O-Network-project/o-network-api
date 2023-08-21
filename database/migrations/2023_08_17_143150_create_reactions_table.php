@@ -28,6 +28,8 @@ class CreateReactionsTable extends Migration
             $table->foreignId('author_id')
                 ->references('id')->on('users')
                 ->cascadeOnDelete();
+
+            $table->unique(['post_id', 'author_id']);
         });
     }
 
