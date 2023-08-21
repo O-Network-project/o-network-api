@@ -9,6 +9,7 @@ use App\Models\Post;
 use App\Models\Reaction;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\ReactionResource;
 
@@ -45,6 +46,19 @@ class ReactionController extends Controller
 
         if ($user->organization_id !== $organization->id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
+        }
+
+        // A user can add only one reaction on a single post
+        /** @var bool $conflict */
+        $conflict = Reaction::
+            where('post_id', $post->id)
+            ->where('author_id', Auth::user()->id)
+            ->exists();
+
+        if ($conflict) {
+            return response()->json([
+                'message' => "A reaction from the same author already exists on this post."
+            ], Response::HTTP_CONFLICT);
         }
 
         $reaction = new Reaction();
