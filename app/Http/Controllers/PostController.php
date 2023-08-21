@@ -26,7 +26,7 @@ class PostController extends Controller
             ->where('users.organization_id', $organization->id)
             ->select('posts.*')
             ->orderBy('posts.created_at', 'desc')
-            ->get();
+            ->paginate(10);
             
     
         return new PostCollection($posts);
@@ -89,7 +89,7 @@ class PostController extends Controller
         $posts = Post::
             where('posts.author_id', $user->id)
             ->orderBy('posts.created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         return new PostCollection($posts);
     }
