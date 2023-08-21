@@ -32,7 +32,7 @@ class UpdateUserRequest extends FormRequest
             'name' => ['sometimes', 'required', 'string', 'max:50'],
             'surname' => ['sometimes', 'required', 'string', 'max:50'],
             'password' => ['prohibited'],
-            'currentPassword' => ['required_with:newPassword', 'string'],
+            'currentPassword' => ['required_with:newPassword', 'string', 'current_password'],
             'newPassword' => ['required_with:currentPassword', 'string', 'regex:/^(?=.*\d)(?=.*[!@#$%^?&*])(?=.*[a-zA-Z]).{8,}$/'],
             'job' => ['sometimes', 'required', 'string', 'max:255'],
             'profilePicture' => ['sometimes', 'nullable', 'file', 'image', 'dimensions:min_width=128,min_height=128'],
