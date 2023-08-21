@@ -21,7 +21,15 @@ class PostController extends Controller
      */
     public function index(Organization $organization)
     {
-        return new PostCollection($organization->posts);
+        $posts = Post::
+            leftJoin('users', 'posts.author_id', '=', 'users.id')
+            ->where('users.organization_id', $organization->id)
+            ->select('posts.*')
+            ->orderBy('posts.created_at', 'desc')
+            ->paginate(10);
+            
+    
+        return new PostCollection($posts);
     }
 
     /**
@@ -78,7 +86,12 @@ class PostController extends Controller
             return abort(404);
         }
 
-        return new PostCollection($user->posts);
+        $posts = Post::
+            where('posts.author_id', $user->id)
+            ->orderBy('posts.created_at', 'desc')
+            ->paginate(10);
+
+        return new PostCollection($posts);
     }
 
     /**
