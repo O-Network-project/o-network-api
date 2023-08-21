@@ -33,10 +33,19 @@ class ReactionSeeder extends Seeder
                 // Using a for loop instead of the count method allows the
                 // author to vary for each reaction.
                 for ($i = 0; $i < rand(0, 15); $i++) {
+                    $author = $otherUsers->random();
+
                     Reaction::factory()
                         ->for($post)
-                        ->for($otherUsers->random(), 'author')
+                        ->for($author, 'author')
                         ->create();
+
+                    // Each user can only add one reaction per post; after the
+                    // adding, the author must not be used again for the current
+                    // post.
+                    $otherUsers = $otherUsers->reject(function (User $user) use ($author) {
+                        return $user->id === $author->id;
+                    });
                 }
             });
         });
