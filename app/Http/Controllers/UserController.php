@@ -152,6 +152,10 @@ class UserController extends Controller
         $user = Auth::user();
 
         if ($user->disabled) {
+            // If the Auth::attempt method works, the user is authenticated and
+            // stored in session. If its disabled, it needs to be logged out to
+            // avoid its persistance in the sessions system.
+            Auth::logout();
             return response()->json(['message' => "Disabled user"], 403);
         }
 
