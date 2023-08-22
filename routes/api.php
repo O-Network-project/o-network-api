@@ -38,7 +38,7 @@ Route::prefix('/organizations')->group(function () {
         });
 
         Route::prefix('/posts')->group(function () {
-            Route::get('/', [PostController::class, 'index'])->name('posts');
+            Route::get('/', [PostController::class, 'showOrganizationPosts'])->name('organization_posts');
             Route::post('/', [PostController::class, 'store'])->name('create_post');
 
             Route::prefix('/{post}')->group(function () {

@@ -15,11 +15,11 @@ use Illuminate\Support\Facades\Auth;
 class PostController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Returns the posts of the provided organization.
      * @param  \App\Models\Organization  $organization
      * @return \Illuminate\Http\Response
      */
-    public function index(Organization $organization)
+    public function showOrganizationPosts(Organization $organization)
     {
         $posts = Post::
             leftJoin('users', 'posts.author_id', '=', 'users.id')
@@ -27,8 +27,8 @@ class PostController extends Controller
             ->select('posts.*')
             ->orderBy('posts.created_at', 'desc')
             ->paginate(10);
-            
-    
+
+
         return new PostCollection($posts);
     }
 
