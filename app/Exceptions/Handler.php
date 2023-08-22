@@ -51,7 +51,7 @@ class Handler extends ExceptionHandler
                     $message = "Organization record not found.";
                 }
 
-                if ($request->is('api/organizations/*/posts/*')) {
+                if ($request->is('api/posts/*')) {
                     $message = "Post record not found.";
                 }
 

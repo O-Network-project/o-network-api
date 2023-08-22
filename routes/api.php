@@ -34,18 +34,10 @@ Route::prefix('/organizations')->group(function () {
 
         Route::prefix('/users')->group(function () {
             Route::get('/', [UserController::class, 'showOrganizationUsers'])->name('organization_users');
-            Route::get('/{user}/posts', [PostController::class, 'showUserPosts'])->name('users_post');
         });
 
         Route::prefix('/posts')->group(function () {
-            Route::get('/', [PostController::class, 'showOrganizationPosts'])->name('organization_posts');
-            Route::post('/', [PostController::class, 'store'])->name('create_post');
-
             Route::prefix('/{post}')->group(function () {
-                Route::get('/', [PostController::class, 'show'])->name('post');
-                Route::patch('/', [PostController::class, 'update'])->name('update_post');
-                Route::delete('/', [PostController::class, 'destroy'])->name('delete_post');
-
                 Route::prefix('/comments')->group(function () {
                     Route::get('/', [CommentController::class, 'showPostComments'])->name('post_comments');
                     Route::post('/', [CommentController::class, 'store'])->name('create_comment');
@@ -96,4 +88,24 @@ Route::prefix('/users')->group(function () {
         Route::get('/profile-picture', [UserController::class, 'showProfilePicture'])->name('profile_picture');
         Route::patch('/', [UserController::class, 'update'])->name('update_user');
     });
+});
+
+// Post model routes
+Route::controller(PostController::class)->group(function () {
+    Route::prefix('/posts')->group(function () {
+        Route::get('/', 'index')->name('posts');
+
+        Route::prefix('/{post}')->group(function () {
+            Route::get('/', 'show')->name('post');
+            Route::patch('/', 'update')->name('update_post');
+            Route::delete('/', 'destroy')->name('delete_post');
+        });
+    });
+
+    Route::prefix('/organizations/{organization}/posts')->group(function () {
+        Route::get('/', 'showOrganizationPosts')->name('organization_posts');
+        Route::post('/', 'store')->name('create_post');
+    });
+
+    Route::get('/users/{user}/posts', 'showUserPosts')->name('users_post');
 });
