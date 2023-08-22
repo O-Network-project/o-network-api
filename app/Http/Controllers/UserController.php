@@ -149,7 +149,7 @@ class UserController extends Controller
             return response()->json(['message' => "Invalid credentials"], 401);
         }
 
-        $user = User::where('email', $credentials['email'])->first();
+        $user = Auth::user();
 
         if ($user->disabled) {
             return response()->json(['message' => "Disabled user"], 403);
