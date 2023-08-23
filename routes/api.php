@@ -19,10 +19,6 @@ use App\Http\Controllers\ReactionController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 // Organization model routes
 Route::prefix('/organizations')->controller(OrganizationController::class)->group(function () {
     Route::get('/', 'index')->name('organizations');
