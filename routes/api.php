@@ -23,17 +23,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::prefix('/organizations')->group(function () {
-    Route::get('/', [OrganizationController::class, 'index'])->name('organizations');
-    Route::get('/validation', [OrganizationController::class, 'check'])->name('validate_organization');
+// Organization model routes
+Route::prefix('/organizations')->controller(OrganizationController::class)->group(function () {
+    Route::get('/', 'index')->name('organizations');
+    Route::get('/validation', 'check')->name('validate_organization');
+    Route::post('/', 'store')->name('create_organization');
 
     Route::prefix('/{organization}')->group(function () {
-        Route::get('/', [OrganizationController::class, 'show'])->name('organization');
-        Route::patch('/', [OrganizationController::class, 'update'])->name('update_organization');
-        Route::delete('/', [OrganizationController::class, 'destroy'])->name('delete_organization');
+        Route::get('/', 'show')->name('organization');
+        Route::patch('/', 'update')->name('update_organization');
+        Route::delete('/', 'destroy')->name('delete_organization');
     });
-
-    Route::post('/', [OrganizationController::class, 'store'])->name('create_organization');
 });
 
 // User model routes
