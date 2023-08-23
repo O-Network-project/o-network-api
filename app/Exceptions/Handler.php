@@ -63,7 +63,7 @@ class Handler extends ExceptionHandler
                     $message = "Reaction record not found.";
                 }
 
-                if ($request->is('api/users/*') || $request->is('api/organizations/*/users/*')) {
+                if ($request->is('api/users/*')) {
                     $message = "User record not found.";
                 }
             }

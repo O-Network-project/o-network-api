@@ -31,29 +31,30 @@ Route::prefix('/organizations')->group(function () {
         Route::get('/', [OrganizationController::class, 'show'])->name('organization');
         Route::patch('/', [OrganizationController::class, 'update'])->name('update_organization');
         Route::delete('/', [OrganizationController::class, 'destroy'])->name('delete_organization');
-
-        Route::prefix('/users')->group(function () {
-            Route::get('/', [UserController::class, 'showOrganizationUsers'])->name('organization_users');
-        });
     });
 
     Route::post('/', [OrganizationController::class, 'store'])->name('create_organization');
 });
 
-Route::prefix('/users')->group(function () {
-    Route::get('/', [UserController::class, 'index'])->name('users');
-    Route::post('/', [UserController::class, 'store'])->name('create_user');
+// User model routes
+Route::controller(UserController::class)->group(function () {
+    Route::prefix('/users')->group(function () {
+        Route::get('/', 'index')->name('users');
+        Route::post('/', 'store')->name('create_user');
 
-    Route::prefix('/session')->group(function () {
-        Route::post('/', [UserController::class, 'login'])->name('login');
-        Route::delete('/', [UserController::class, 'logout'])->name('logout');
+        Route::prefix('/{user}')->group(function () {
+            Route::get('/', 'show')->name('user');
+            Route::get('/profile-picture', 'showProfilePicture')->name('profile_picture');
+            Route::patch('/', 'update')->name('update_user');
+        });
+
+        Route::prefix('/session')->group(function () {
+            Route::post('/', 'login')->name('login');
+            Route::delete('/', 'logout')->name('logout');
+        });
     });
 
-    Route::prefix('/{user}')->group(function () {
-        Route::get('/', [UserController::class, 'show'])->name('user');
-        Route::get('/profile-picture', [UserController::class, 'showProfilePicture'])->name('profile_picture');
-        Route::patch('/', [UserController::class, 'update'])->name('update_user');
-    });
+    Route::get('/organizations/{organization}/users', 'showOrganizationUsers')->name('organization_users');
 });
 
 // Post model routes
