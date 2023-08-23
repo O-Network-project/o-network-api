@@ -16,35 +16,30 @@ use App\Http\Resources\ReactionResource;
 class ReactionController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Should return all the reactions of the database. But in this app MVP, no
+     * user with any role can access that full list.
+     * This method is only here to avoid an error when requesting the /reactions
+     * URI with the GET verb.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        // In that app MVP, no user with any role can access the list of all
-        // reactions of an organization
         return response(null, 403);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created reaction in storage.
      *
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Post  $post
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Organization $organization, Post $post, StoreReactionRequest $request)
+    public function store(Post $post, StoreReactionRequest $request)
     {
         $user = Auth::user();
 
-        // If the post is not in this organization, it's considered as not found
-        if ($post->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
-        if ($user->organization_id !== $organization->id) {
+        if ($user->organization_id !== $post->author->organization_id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 
@@ -52,7 +47,7 @@ class ReactionController extends Controller
         /** @var bool $conflict */
         $conflict = Reaction::
             where('post_id', $post->id)
-            ->where('author_id', Auth::user()->id)
+            ->where('author_id', $user->id)
             ->exists();
 
         if ($conflict) {
@@ -71,58 +66,37 @@ class ReactionController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Return the specified reaction.
      *
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Reaction  $reaction
      * @return \Illuminate\Http\Response
      */
-    public function show(Organization $organization, Reaction $reaction)
+    public function show(Reaction $reaction)
     {
-        // If the reaction is not in this organization, it's considered as not
-        // found
-        if ($reaction->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
         return new ReactionResource($reaction);
     }
 
     /**
      * Return all the reactions of the specified post.
      *
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function showPostReactions(Organization $organization, Post $post)
+    public function showPostReactions(Post $post)
     {
-        // If the post is not in this organization, it's considered as not
-        // found
-        if ($post->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
         return new ReactionCollection($post->reactions);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified reaction in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Reaction  $reaction
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateReactionRequest $request, Organization $organization, Reaction $reaction)
+    public function update(UpdateReactionRequest $request, Reaction $reaction)
     {
-        // If the reaction is not in this organization, it's considered as not
-        // found
-        if ($reaction->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
-        if (Auth::user()->organization_id !== $organization->id) {
+        if (Auth::user()->organization_id !== $reaction->post->author->organization_id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 
@@ -131,21 +105,14 @@ class ReactionController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified reaction from storage.
      *
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Reaction  $reaction
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Organization $organization, Reaction $reaction)
+    public function destroy(Reaction $reaction)
     {
-        // If the reaction is not in this organization, it's considered as not
-        // found
-        if ($reaction->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
-        if (Auth::user()->organization_id !== $organization->id) {
+        if (Auth::user()->organization_id !== $reaction->post->author->organization_id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 

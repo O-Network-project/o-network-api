@@ -35,25 +35,6 @@ Route::prefix('/organizations')->group(function () {
         Route::prefix('/users')->group(function () {
             Route::get('/', [UserController::class, 'showOrganizationUsers'])->name('organization_users');
         });
-
-        Route::prefix('/posts')->group(function () {
-            Route::prefix('/{post}')->group(function () {
-                Route::prefix('/reactions')->group(function () {
-                    Route::get('/', [ReactionController::class, 'showPostReactions'])->name('post_reactions');
-                    Route::post('/', [ReactionController::class, 'store'])->name('create_reaction');
-                });
-            });
-        });
-
-        Route::prefix('/reactions')->group(function () {
-            Route::get('/', [ReactionController::class, 'index'])->name('reactions');
-
-            Route::prefix('/{reaction}')->group(function () {
-                Route::get('/', [ReactionController::class, 'show'])->name('reaction');
-                Route::patch('/', [ReactionController::class, 'update'])->name('update_reaction');
-                Route::delete('/', [ReactionController::class, 'destroy'])->name('delete_reaction');
-            });
-        });
     });
 
     Route::post('/', [OrganizationController::class, 'store'])->name('create_organization');
@@ -110,5 +91,23 @@ Route::controller(CommentController::class)->group(function () {
     Route::prefix('/posts/{post}/comments')->group(function () {
         Route::get('/', 'showPostComments')->name('post_comments');
         Route::post('/', 'store')->name('create_comment');
+    });
+});
+
+// Reaction model routes
+Route::controller(ReactionController::class)->group(function () {
+    Route::prefix('/reactions')->group(function () {
+        Route::get('/', 'index')->name('reactions');
+
+        Route::prefix('/{reaction}')->group(function () {
+            Route::get('/', 'show')->name('reaction');
+            Route::patch('/', 'update')->name('update_reaction');
+            Route::delete('/', 'destroy')->name('delete_reaction');
+        });
+    });
+
+    Route::prefix('/posts/{post}/reactions')->group(function () {
+        Route::get('/', 'showPostReactions')->name('post_reactions');
+        Route::post('/', 'store')->name('create_reaction');
     });
 });
