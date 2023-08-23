@@ -51,19 +51,19 @@ class Handler extends ExceptionHandler
                     $message = "Organization record not found.";
                 }
 
-                if ($request->is('api/organizations/*/posts/*')) {
+                if ($request->is('api/posts/*')) {
                     $message = "Post record not found.";
                 }
 
-                if ($request->is('api/organizations/*/comments/*')) {
+                if ($request->is('api/comments/*')) {
                     $message = "Comment record not found.";
                 }
 
-                if ($request->is('api/organizations/*/reactions/*')) {
+                if ($request->is('api/reactions/*')) {
                     $message = "Reaction record not found.";
                 }
 
-                if ($request->is('api/users/*') || $request->is('api/organizations/*/users/*')) {
+                if ($request->is('api/users/*')) {
                     $message = "User record not found.";
                 }
             }

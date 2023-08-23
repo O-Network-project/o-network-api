@@ -19,81 +19,92 @@ use App\Http\Controllers\ReactionController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::prefix('/organizations')->group(function () {
-    Route::get('/', [OrganizationController::class, 'index'])->name('organizations');
-    Route::get('/validation', [OrganizationController::class, 'check'])->name('validate_organization');
+// Organization model routes
+Route::prefix('/organizations')->controller(OrganizationController::class)->group(function () {
+    Route::get('/', 'index')->name('organizations');
+    Route::get('/validation', 'check')->name('validate_organization');
+    Route::post('/', 'store')->name('create_organization');
 
     Route::prefix('/{organization}')->group(function () {
-        Route::get('/', [OrganizationController::class, 'show'])->name('organization');
-        Route::patch('/', [OrganizationController::class, 'update'])->name('update_organization');
-        Route::delete('/', [OrganizationController::class, 'destroy'])->name('delete_organization');
-
-        Route::prefix('/users')->group(function () {
-            Route::get('/', [UserController::class, 'showOrganizationUsers'])->name('organization_users');
-            Route::get('/{user}/posts', [PostController::class, 'showUserPosts'])->name('users_post');
-        });
-
-        Route::prefix('/posts')->group(function () {
-            Route::get('/', [PostController::class, 'index'])->name('posts');
-            Route::post('/', [PostController::class, 'store'])->name('create_post');
-
-            Route::prefix('/{post}')->group(function () {
-                Route::get('/', [PostController::class, 'show'])->name('post');
-                Route::patch('/', [PostController::class, 'update'])->name('update_post');
-                Route::delete('/', [PostController::class, 'destroy'])->name('delete_post');
-
-                Route::prefix('/comments')->group(function () {
-                    Route::get('/', [CommentController::class, 'showPostComments'])->name('post_comments');
-                    Route::post('/', [CommentController::class, 'store'])->name('create_comment');
-                });
-
-                Route::prefix('/reactions')->group(function () {
-                    Route::get('/', [ReactionController::class, 'showPostReactions'])->name('post_reactions');
-                    Route::post('/', [ReactionController::class, 'store'])->name('create_reaction');
-                });
-            });
-        });
-
-        Route::prefix('/comments')->group(function () {
-            Route::get('/', [CommentController::class, 'index'])->name('comments');
-
-            Route::prefix('/{comment}')->group(function () {
-                Route::get('/', [CommentController::class, 'show'])->name('comment');
-                Route::patch('/', [CommentController::class, 'update'])->name('update_comment');
-                Route::delete('/', [CommentController::class, 'destroy'])->name('delete_comment');
-            });
-        });
-
-        Route::prefix('/reactions')->group(function () {
-            Route::get('/', [ReactionController::class, 'index'])->name('reactions');
-
-            Route::prefix('/{reaction}')->group(function () {
-                Route::get('/', [ReactionController::class, 'show'])->name('reaction');
-                Route::patch('/', [ReactionController::class, 'update'])->name('update_reaction');
-                Route::delete('/', [ReactionController::class, 'destroy'])->name('delete_reaction');
-            });
-        });
+        Route::get('/', 'show')->name('organization');
+        Route::patch('/', 'update')->name('update_organization');
+        Route::delete('/', 'destroy')->name('delete_organization');
     });
-
-    Route::post('/', [OrganizationController::class, 'store'])->name('create_organization');
 });
 
-Route::prefix('/users')->group(function () {
-    Route::get('/', [UserController::class, 'index'])->name('users');
-    Route::post('/', [UserController::class, 'store'])->name('create_user');
+// User model routes
+Route::controller(UserController::class)->group(function () {
+    Route::prefix('/users')->group(function () {
+        Route::get('/', 'index')->name('users');
+        Route::post('/', 'store')->name('create_user');
 
-    Route::prefix('/session')->group(function () {
-        Route::post('/', [UserController::class, 'login'])->name('login');
-        Route::delete('/', [UserController::class, 'logout'])->name('logout');
+        Route::prefix('/{user}')->group(function () {
+            Route::get('/', 'show')->name('user');
+            Route::get('/profile-picture', 'showProfilePicture')->name('profile_picture');
+            Route::patch('/', 'update')->name('update_user');
+        });
+
+        Route::prefix('/session')->group(function () {
+            Route::post('/', 'login')->name('login');
+            Route::delete('/', 'logout')->name('logout');
+        });
     });
 
-    Route::prefix('/{user}')->group(function () {
-        Route::get('/', [UserController::class, 'show'])->name('user');
-        Route::get('/profile-picture', [UserController::class, 'showProfilePicture'])->name('profile_picture');
-        Route::patch('/', [UserController::class, 'update'])->name('update_user');
+    Route::get('/organizations/{organization}/users', 'showOrganizationUsers')->name('organization_users');
+});
+
+// Post model routes
+Route::controller(PostController::class)->group(function () {
+    Route::prefix('/posts')->group(function () {
+        Route::get('/', 'index')->name('posts');
+
+        Route::prefix('/{post}')->group(function () {
+            Route::get('/', 'show')->name('post');
+            Route::patch('/', 'update')->name('update_post');
+            Route::delete('/', 'destroy')->name('delete_post');
+        });
+    });
+
+    Route::prefix('/organizations/{organization}/posts')->group(function () {
+        Route::get('/', 'showOrganizationPosts')->name('organization_posts');
+        Route::post('/', 'store')->name('create_post');
+    });
+
+    Route::get('/users/{user}/posts', 'showUserPosts')->name('users_post');
+});
+
+// Comment model routes
+Route::controller(CommentController::class)->group(function () {
+    Route::prefix('/comments')->group(function () {
+        Route::get('/', 'index')->name('comments');
+
+        Route::prefix('/{comment}')->group(function () {
+            Route::get('/', 'show')->name('comment');
+            Route::patch('/', 'update')->name('update_comment');
+            Route::delete('/', 'destroy')->name('delete_comment');
+        });
+    });
+
+    Route::prefix('/posts/{post}/comments')->group(function () {
+        Route::get('/', 'showPostComments')->name('post_comments');
+        Route::post('/', 'store')->name('create_comment');
+    });
+});
+
+// Reaction model routes
+Route::controller(ReactionController::class)->group(function () {
+    Route::prefix('/reactions')->group(function () {
+        Route::get('/', 'index')->name('reactions');
+
+        Route::prefix('/{reaction}')->group(function () {
+            Route::get('/', 'show')->name('reaction');
+            Route::patch('/', 'update')->name('update_reaction');
+            Route::delete('/', 'destroy')->name('delete_reaction');
+        });
+    });
+
+    Route::prefix('/posts/{post}/reactions')->group(function () {
+        Route::get('/', 'showPostReactions')->name('post_reactions');
+        Route::post('/', 'store')->name('create_reaction');
     });
 });

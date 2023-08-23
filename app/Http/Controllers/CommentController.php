@@ -7,43 +7,36 @@ use App\Http\Requests\UpdateCommentRequest;
 use App\Http\Resources\CommentCollection;
 use App\Models\Post;
 use App\Models\Comment;
-use App\Models\Organization;
-use Illuminate\Http\Request;
 use App\Http\Resources\CommentResource;
 use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Should return all the comments of the database. But in this app MVP, no
+     * user with any role can access that full list.
+     * This method is only here to avoid an error when requesting the /comments
+     * URI with the GET verb.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        // In that app MVP, no user with any role can access the list of all
-        // comments of an organization
         return response(null, 403);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created comment in storage.
      *
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Post  $post
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Organization $organization, Post $post, StoreCommentRequest $request)
+    public function store(Post $post, StoreCommentRequest $request)
     {
         $user = Auth::user();
 
-        // If the post is not in this organization, it's considered as not found
-        if ($post->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
-        if ($user->organization_id !== $organization->id) {
+        if ($user->organization_id !== $post->author->organization_id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 
@@ -57,58 +50,37 @@ class CommentController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Return the specified comment.
      *
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function show(Organization $organization, Comment $comment)
+    public function show(Comment $comment)
     {
-        // If the comment is not in this organization, it's considered as not
-        // found
-        if ($comment->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
         return new CommentResource($comment);
     }
 
     /**
      * Return all the comments of the specified post.
      *
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function showPostComments(Organization $organization, Post $post)
+    public function showPostComments(Post $post)
     {
-        // If the post is not in this organization, it's considered as not
-        // found
-        if ($post->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
         return new CommentCollection($post->comments);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified comment in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateCommentRequest $request, Organization $organization, Comment $comment)
+    public function update(UpdateCommentRequest $request, Comment $comment)
     {
-        // If the comment is not in this organization, it's considered as not
-        // found
-        if ($comment->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
-        if (Auth::user()->organization_id !== $organization->id) {
+        if (Auth::user()->organization_id !== $comment->post->author->organization_id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 
@@ -116,21 +88,14 @@ class CommentController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified comment from storage.
      *
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Organization $organization, Comment $comment)
+    public function destroy(Comment $comment)
     {
-        // If the comment is not in this organization, it's considered as not
-        // found
-        if ($comment->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
-        if (Auth::user()->organization_id !== $organization->id) {
+        if (Auth::user()->organization_id !== $comment->post->author->organization_id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 

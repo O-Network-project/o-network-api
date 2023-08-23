@@ -15,21 +15,16 @@ use Illuminate\Support\Facades\Auth;
 class PostController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     * @param  \App\Models\Organization  $organization
+     * Should return all the posts of the database. But in this app MVP, no user
+     * with any role can access that full list.
+     * This method is only here to avoid an error when requesting the /posts URI
+     * with the GET verb.
+     *
      * @return \Illuminate\Http\Response
      */
-    public function index(Organization $organization)
+    public function index()
     {
-        $posts = Post::
-            leftJoin('users', 'posts.author_id', '=', 'users.id')
-            ->where('users.organization_id', $organization->id)
-            ->select('posts.*')
-            ->orderBy('posts.created_at', 'desc')
-            ->paginate(10);
-            
-    
-        return new PostCollection($posts);
+        return response(null, 403);
     }
 
     /**
@@ -56,36 +51,42 @@ class PostController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Return the specified post.
      *
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function show(Organization $organization, Post $post)
+    public function show(Post $post)
     {
-        // If the post is not in this organization, it's considered as not found
-        if ($post->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
         return new PostResource($post);
+    }
+
+    /**
+     * Returns the posts of the provided organization.
+     * @param  \App\Models\Organization  $organization
+     * @return \Illuminate\Http\Response
+     */
+    public function showOrganizationPosts(Organization $organization)
+    {
+        $posts = Post::
+            leftJoin('users', 'posts.author_id', '=', 'users.id')
+            ->where('users.organization_id', $organization->id)
+            ->select('posts.*')
+            ->orderBy('posts.created_at', 'desc')
+            ->paginate(10);
+
+
+        return new PostCollection($posts);
     }
 
     /**
      * Return the posts of a specific user.
      *
-     * @param  \App\Models\Organization  $organization
-     * @param  \App\Models\Post  $post
+     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function showUserPosts(Organization $organization, User $user)
+    public function showUserPosts(User $user)
     {
-        // If the user is not in this organization, it's considered as not found
-        if ($user->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
         $posts = Post::
             where('posts.author_id', $user->id)
             ->orderBy('posts.created_at', 'desc')
@@ -98,21 +99,11 @@ class PostController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdatePostRequest $request, Organization $organization, Post $post)
+    public function update(UpdatePostRequest $request, Post $post)
     {
-        // If the post is not in this organization, it's considered as not found
-        if ($post->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
-        if (Auth::user()->organization_id !== $organization->id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $post->update($request->all());
     }
 
@@ -122,17 +113,8 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Organization $organization, Post $post)
+    public function destroy(Post $post)
     {
-        // If the post is not in this organization, it's considered as not found
-        if ($post->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
-        if (Auth::user()->organization_id !== $organization->id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $post->delete();
     }
 }
