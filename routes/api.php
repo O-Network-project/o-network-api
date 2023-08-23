@@ -38,25 +38,10 @@ Route::prefix('/organizations')->group(function () {
 
         Route::prefix('/posts')->group(function () {
             Route::prefix('/{post}')->group(function () {
-                Route::prefix('/comments')->group(function () {
-                    Route::get('/', [CommentController::class, 'showPostComments'])->name('post_comments');
-                    Route::post('/', [CommentController::class, 'store'])->name('create_comment');
-                });
-
                 Route::prefix('/reactions')->group(function () {
                     Route::get('/', [ReactionController::class, 'showPostReactions'])->name('post_reactions');
                     Route::post('/', [ReactionController::class, 'store'])->name('create_reaction');
                 });
-            });
-        });
-
-        Route::prefix('/comments')->group(function () {
-            Route::get('/', [CommentController::class, 'index'])->name('comments');
-
-            Route::prefix('/{comment}')->group(function () {
-                Route::get('/', [CommentController::class, 'show'])->name('comment');
-                Route::patch('/', [CommentController::class, 'update'])->name('update_comment');
-                Route::delete('/', [CommentController::class, 'destroy'])->name('delete_comment');
             });
         });
 
@@ -108,4 +93,22 @@ Route::controller(PostController::class)->group(function () {
     });
 
     Route::get('/users/{user}/posts', 'showUserPosts')->name('users_post');
+});
+
+// Comment model routes
+Route::controller(CommentController::class)->group(function () {
+    Route::prefix('/comments')->group(function () {
+        Route::get('/', 'index')->name('comments');
+
+        Route::prefix('/{comment}')->group(function () {
+            Route::get('/', 'show')->name('comment');
+            Route::patch('/', 'update')->name('update_comment');
+            Route::delete('/', 'destroy')->name('delete_comment');
+        });
+    });
+
+    Route::prefix('/posts/{post}/comments')->group(function () {
+        Route::get('/', 'showPostComments')->name('post_comments');
+        Route::post('/', 'store')->name('create_comment');
+    });
 });
