@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Models\ReactionType;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateReactionRequest extends FormRequest
+class StoreOrUpdateReactionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
