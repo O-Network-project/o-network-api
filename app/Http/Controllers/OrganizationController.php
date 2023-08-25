@@ -8,6 +8,7 @@ use App\Http\Resources\OrganizationResource;
 use App\Http\Requests\StoreOrganizationRequest;
 use App\Http\Requests\UpdateOrganizationRequest;
 use App\Http\Requests\ValidateOrganizationRequest;
+use Illuminate\Http\Response;
 
 class OrganizationController extends Controller
 {
@@ -73,7 +74,7 @@ class OrganizationController extends Controller
 
         if ($conflicts) {
             response()
-                ->json(['message' => "The organization '$name' already exists."], 409)
+                ->json(['message' => "The organization '$name' already exists."], Response::HTTP_CONFLICT)
                 ->throwResponse();
         }
     }
