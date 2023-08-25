@@ -37,7 +37,7 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $user = new User();
-        $user->fill($request->all());
+        $user->fill($request->validated());
 
         if ($request->hasFile('profilePicture')) {
             $user->profile_picture = $this->storeProfilePicture($request->file('profilePicture'));
@@ -86,7 +86,7 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        $inputs = $request->all();
+        $inputs = $request->validated();
 
         if ($request->hasFile('profilePicture')) {
             Storage::disk('public')->delete("/profiles-pictures/$user->profile_picture");
@@ -143,7 +143,7 @@ class UserController extends Controller
      */
     public function login(LoginRequest $request)
     {
-        $credentials = $request->all();
+        $credentials = $request->validated();
 
         if (!Auth::attempt($credentials)) {
             return response()->json(['message' => "Invalid credentials"], 401);

@@ -31,7 +31,7 @@ class OrganizationController extends Controller
      */
     public function store(StoreOrganizationRequest $request)
     {
-        return new OrganizationResource(Organization::create($request->all()));
+        return new OrganizationResource(Organization::create($request->validated()));
     }
 
     /**
@@ -69,7 +69,7 @@ class OrganizationController extends Controller
      */
     public function update(UpdateOrganizationRequest $request, Organization $organization)
     {
-        $organization->update($request->all());
+        $organization->update($request->validated());
     }
 
     /**

@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreReactionRequest;
-use App\Http\Requests\UpdateReactionRequest;
+use App\Http\Requests\StoreOrUpdateReactionRequest;
 use App\Http\Resources\ReactionCollection;
 use App\Models\Post;
 use App\Models\Reaction;
@@ -35,7 +34,7 @@ class ReactionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Post $post, StoreReactionRequest $request)
+    public function store(Post $post, StoreOrUpdateReactionRequest $request)
     {
         $user = Auth::user();
 
@@ -57,7 +56,7 @@ class ReactionController extends Controller
         }
 
         $reaction = new Reaction();
-        $reaction->fill($request->all());
+        $reaction->fill($request->validated());
         $reaction->author_id = $user->id;
         $reaction->post_id = $post->id;
         $reaction->save();
@@ -94,13 +93,13 @@ class ReactionController extends Controller
      * @param  \App\Models\Reaction  $reaction
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateReactionRequest $request, Reaction $reaction)
+    public function update(StoreOrUpdateReactionRequest $request, Reaction $reaction)
     {
         if (Auth::user()->organization_id !== $reaction->post->author->organization_id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 
-        $reaction->update($request->all());
+        $reaction->update($request->validated());
         return new ReactionResource($reaction);
     }
 

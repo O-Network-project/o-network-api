@@ -41,7 +41,7 @@ class CommentController extends Controller
         }
 
         $comment = new Comment();
-        $comment->fill($request->all());
+        $comment->fill($request->validated());
         $comment->author_id = $user->id;
         $comment->post_id = $post->id;
         $comment->save();
@@ -84,7 +84,7 @@ class CommentController extends Controller
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 
-        $comment->update($request->all());
+        $comment->update($request->validated());
     }
 
     /**
