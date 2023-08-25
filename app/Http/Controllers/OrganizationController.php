@@ -31,6 +31,8 @@ class OrganizationController extends Controller
      */
     public function store(StoreOrganizationRequest $request)
     {
+        $this->checkNameConflict($request);
+
         return new OrganizationResource(Organization::create($request->validated()));
     }
 
@@ -42,11 +44,38 @@ class OrganizationController extends Controller
      */
     public function check(ValidateOrganizationRequest $request)
     {
-        $name = $request->input('name');
-        $conflicts = Organization::where('name', $name)->exists();
+        $this->checkNameConflict($request);
+    }
 
-        if ($conflicts)
-            return response()->json(['message' => "The organization '$name' already exists."], 409);
+    /**
+     * Check if there is already an organization with the same name than the one
+     * sent with the request. Send a 409 response if it's the case.
+     * This treatment could have been done in the FormRequest classes, but they
+     * return a 422 HTTP status code, whereas a 409 is more appropriate in this
+     * case.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Organization  $organization  In case of an update, the concerned organization.
+     * @return \Illuminate\Http\Response
+     */
+    private function checkNameConflict(Request $request, ?Organization $organization = null)
+    {
+        $name = $request->input('name');
+        $query = Organization::where('name', $name);
+
+        // In case of an update, avoids throwing the error if the concerned
+        // organization kept the same name
+        if ($organization) {
+            $query->where('id', '!=', $organization->id);
+        }
+
+        $conflicts = $query->exists();
+
+        if ($conflicts) {
+            response()
+                ->json(['message' => "The organization '$name' already exists."], 409)
+                ->throwResponse();
+        }
     }
 
     /**
@@ -69,6 +98,8 @@ class OrganizationController extends Controller
      */
     public function update(UpdateOrganizationRequest $request, Organization $organization)
     {
+        $this->checkNameConflict($request, $organization);
+
         $organization->update($request->validated());
     }
 
