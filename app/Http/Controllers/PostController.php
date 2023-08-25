@@ -43,7 +43,7 @@ class PostController extends Controller
         }
 
         $post = new Post();
-        $post->fill($request->all());
+        $post->fill($request->validated());
         $post->author_id = $user->id;
         $post->save();
 
@@ -104,7 +104,7 @@ class PostController extends Controller
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
-        $post->update($request->all());
+        $post->update($request->validated());
     }
 
     /**

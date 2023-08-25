@@ -57,7 +57,7 @@ class ReactionController extends Controller
         }
 
         $reaction = new Reaction();
-        $reaction->fill($request->all());
+        $reaction->fill($request->validated());
         $reaction->author_id = $user->id;
         $reaction->post_id = $post->id;
         $reaction->save();
@@ -100,7 +100,7 @@ class ReactionController extends Controller
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 
-        $reaction->update($request->all());
+        $reaction->update($request->validated());
         return new ReactionResource($reaction);
     }
 

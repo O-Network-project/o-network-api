@@ -29,10 +29,15 @@ class UpdateReactionRequest extends FormRequest
         ];
     }
 
-    protected function passedValidation()
+    // Normally, the passedValidation method should be used for this purpose.
+    // But its not working with the Request::validated() method controller-side,
+    // only with the Request::all() one. Overriding the validated method was the
+    // easiest way to keep this behavior.
+    public function validated()
     {
-        $this->merge([
-            'type_id' => ReactionType::where('tag', $this->type)->first()->id
-        ]);
+        $request = parent::validated();
+
+        $request['type_id'] = ReactionType::where('tag', $this->type)->first()->id;
+        return $request;
     }
 }
