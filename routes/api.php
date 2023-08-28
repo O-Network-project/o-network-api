@@ -43,11 +43,11 @@ Route::controller(UserController::class)->group(function () {
             Route::get('/profile-picture', 'showProfilePicture')->name('profile_picture');
             Route::patch('/', 'update')->name('update_user');
         });
+    });
 
-        Route::prefix('/session')->group(function () {
-            Route::post('/', 'login')->name('login');
-            Route::delete('/', 'logout')->name('logout');
-        });
+    Route::prefix('/session')->group(function () {
+        Route::post('/', 'login')->name('login');
+        Route::delete('/', 'logout')->name('logout');
     });
 
     Route::get('/organizations/{organization}/users', 'showOrganizationUsers')->name('organization_users');
