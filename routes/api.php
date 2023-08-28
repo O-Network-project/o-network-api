@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrganizationController;
@@ -45,12 +45,13 @@ Route::controller(UserController::class)->group(function () {
         });
     });
 
-    Route::prefix('/session')->group(function () {
-        Route::post('/', 'login')->name('login');
-        Route::delete('/', 'logout')->name('logout');
-    });
-
     Route::get('/organizations/{organization}/users', 'showOrganizationUsers')->name('organization_users');
+});
+
+// Authentication
+Route::prefix('/session')->controller(AuthController::class)->group(function () {
+    Route::post('/', 'login')->name('login');
+    Route::delete('/', 'logout')->name('logout');
 });
 
 // Post model routes
