@@ -21,31 +21,37 @@ use App\Http\Controllers\ReactionController;
 
 // Organization model routes
 Route::prefix('/organizations')->controller(OrganizationController::class)->group(function () {
-    Route::get('/', 'index')->name('organizations');
     Route::get('/validation', 'check')->name('validate_organization');
     Route::post('/', 'store')->name('create_organization');
 
-    Route::prefix('/{organization}')->group(function () {
-        Route::get('/', 'show')->name('organization');
-        Route::patch('/', 'update')->name('update_organization');
-        Route::delete('/', 'destroy')->name('delete_organization');
+    Route::middleware('auth')->group(function () {
+        Route::get('/', 'index')->name('organizations');
+
+        Route::prefix('/{organization}')->group(function () {
+            Route::get('/', 'show')->name('organization');
+            Route::patch('/', 'update')->name('update_organization');
+            Route::delete('/', 'destroy')->name('delete_organization');
+        });
     });
 });
 
 // User model routes
 Route::controller(UserController::class)->group(function () {
-    Route::prefix('/users')->group(function () {
-        Route::get('/', 'index')->name('users');
-        Route::post('/', 'store')->name('create_user');
+    Route::post('/users', 'store')->name('create_user');
 
-        Route::prefix('/{user}')->group(function () {
-            Route::get('/', 'show')->name('user');
-            Route::get('/profile-picture', 'showProfilePicture')->name('profile_picture');
-            Route::patch('/', 'update')->name('update_user');
+    Route::middleware('auth')->group(function () {
+        Route::prefix('/users')->group(function () {
+            Route::get('/', 'index')->name('users');
+
+            Route::prefix('/{user}')->group(function () {
+                Route::get('/', 'show')->name('user');
+                Route::get('/profile-picture', 'showProfilePicture')->name('profile_picture');
+                Route::patch('/', 'update')->name('update_user');
+            });
         });
-    });
 
-    Route::get('/organizations/{organization}/users', 'showOrganizationUsers')->name('organization_users');
+        Route::get('/organizations/{organization}/users', 'showOrganizationUsers')->name('organization_users');
+    });
 });
 
 // Authentication
@@ -55,7 +61,7 @@ Route::prefix('/session')->controller(AuthController::class)->group(function () 
 });
 
 // Post model routes
-Route::controller(PostController::class)->group(function () {
+Route::controller(PostController::class)->middleware('auth')->group(function () {
     Route::prefix('/posts')->group(function () {
         Route::get('/', 'index')->name('posts');
         Route::post('/', 'store')->name('create_post');
@@ -72,7 +78,7 @@ Route::controller(PostController::class)->group(function () {
 });
 
 // Comment model routes
-Route::controller(CommentController::class)->group(function () {
+Route::controller(CommentController::class)->middleware('auth')->group(function () {
     Route::prefix('/comments')->group(function () {
         Route::get('/', 'index')->name('comments');
 
@@ -90,7 +96,7 @@ Route::controller(CommentController::class)->group(function () {
 });
 
 // Reaction model routes
-Route::controller(ReactionController::class)->group(function () {
+Route::controller(ReactionController::class)->middleware('auth')->group(function () {
     Route::prefix('/reactions')->group(function () {
         Route::get('/', 'index')->name('reactions');
 
