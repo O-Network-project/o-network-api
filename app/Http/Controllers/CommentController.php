@@ -36,7 +36,7 @@ class CommentController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->organization_id !== $post->author->organization_id) {
+        if ($user->organization_id !== $post->organization->id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 
@@ -80,7 +80,7 @@ class CommentController extends Controller
      */
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
-        if (Auth::user()->organization_id !== $comment->post->author->organization_id) {
+        if (Auth::user()->organization_id !== $comment->organization->id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 
@@ -95,7 +95,7 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        if (Auth::user()->organization_id !== $comment->post->author->organization_id) {
+        if (Auth::user()->organization_id !== $comment->organization->id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 

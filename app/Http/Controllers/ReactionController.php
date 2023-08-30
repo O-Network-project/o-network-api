@@ -38,7 +38,7 @@ class ReactionController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->organization_id !== $post->author->organization_id) {
+        if ($user->organization_id !== $post->organization->id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 
@@ -95,7 +95,7 @@ class ReactionController extends Controller
      */
     public function update(StoreOrUpdateReactionRequest $request, Reaction $reaction)
     {
-        if (Auth::user()->organization_id !== $reaction->post->author->organization_id) {
+        if (Auth::user()->organization_id !== $reaction->organization->id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 
@@ -111,7 +111,7 @@ class ReactionController extends Controller
      */
     public function destroy(Reaction $reaction)
     {
-        if (Auth::user()->organization_id !== $reaction->post->author->organization_id) {
+        if (Auth::user()->organization_id !== $reaction->organization->id) {
             return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
         }
 
