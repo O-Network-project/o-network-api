@@ -23,11 +23,13 @@ class Comment extends Model
         return $this->hasOneThrough(Organization::class, User::class, 'id', 'id', 'author_id', 'organization_id');
     }
 
-    public function post() {
+    public function post()
+    {
         return $this->belongsTo(Post::class);
     }
 
-    public function author() {
+    public function author()
+    {
         return $this->belongsTo(User::class, 'author_id');
     }
 }

@@ -13,7 +13,8 @@ class Post extends Model
         'text'
     ];
 
-    public function organization(){
+    public function organization()
+    {
         // The arguments of this hasOneThrough call seem a little bit strange,
         // but it's the only way to make it work with a ManyToOne final
         // relationship (= multiple users in a single organization). Check the
@@ -22,15 +23,18 @@ class Post extends Model
         return $this->hasOneThrough(Organization::class, User::class, 'id', 'id', 'author_id', 'organization_id');
     }
 
-    public function author() {
+    public function author()
+    {
         return $this->belongsTo(User::class, 'author_id');
     }
 
-    public function comments() {
+    public function comments()
+    {
         return $this->hasMany(Comment::class);
     }
 
-    public function reactions() {
+    public function reactions()
+    {
         return $this->hasMany(Reaction::class);
     }
 }
