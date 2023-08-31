@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Post::class, 'post');
+    }
+
     /**
      * Should return all the posts of the database. But in this app MVP, no user
      * with any role can access that full list.
