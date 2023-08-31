@@ -25,27 +25,39 @@ class PostPolicy extends ContentPolicy
 
     /**
      * Determine whether the user can view any posts from an organization.
+     * The organization can be passed as an argument when used with the
+     * authorize() method, or it will be automatically extracted from the route.
      *
      * @param  \App\Models\User  $user
+     * @param  \App\Models\Organization  $organization
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function viewAnyFromOrganization(User $user)
+    public function viewAnyFromOrganization(User $user, ?Organization $organization = null)
     {
-        /** @var Organization $organization */
-        $organization = Route::current()->parameter('organization');
+        if (!$organization) {
+            /** @var Organization $organization */
+            $organization = Route::current()->parameter('organization');
+        }
+
         return self::sameOrganizationResponse($user, $organization);
     }
 
     /**
      * Determine whether the user can view any posts from a user.
+     * The user can be passed as an argument when used with the authorize()
+     * method, or it will be automatically extracted from the route.
      *
      * @param  \App\Models\User  $user
+     * @param  \App\Models\User  $postsOwner
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function viewAnyFromUser(User $user)
+    public function viewAnyFromUser(User $user, ?User $postsOwner = null)
     {
-        /** @var User $postsOwner */
-        $postsOwner = Route::current()->parameter('user');
+        if (!$postsOwner) {
+            /** @var User $postsOwner */
+            $postsOwner = Route::current()->parameter('user');
+        }
+
         return self::sameOrganizationResponse($user, $postsOwner);
     }
 
