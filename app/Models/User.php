@@ -50,6 +50,16 @@ class User extends Authenticatable
         'role_id' => 1
     ];
 
+    /**
+     * Return true if the user has an admin role, else false.
+     *
+     * @return boolean
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role_id === 2;
+    }
+
     public function organization() {
         return $this->belongsTo(Organization::class);
     }
