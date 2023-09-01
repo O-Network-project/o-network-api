@@ -58,6 +58,7 @@ Route::prefix('/session')->controller(AuthController::class)->group(function () 
 Route::controller(PostController::class)->group(function () {
     Route::prefix('/posts')->group(function () {
         Route::get('/', 'index')->name('posts');
+        Route::post('/', 'store')->name('create_post');
 
         Route::prefix('/{post}')->group(function () {
             Route::get('/', 'show')->name('post');
@@ -66,11 +67,7 @@ Route::controller(PostController::class)->group(function () {
         });
     });
 
-    Route::prefix('/organizations/{organization}/posts')->group(function () {
-        Route::get('/', 'showOrganizationPosts')->name('organization_posts');
-        Route::post('/', 'store')->name('create_post');
-    });
-
+    Route::get('/organizations/{organization}/posts', 'showOrganizationPosts')->name('organization_posts');
     Route::get('/users/{user}/posts', 'showUserPosts')->name('users_post');
 });
 
