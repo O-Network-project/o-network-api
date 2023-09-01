@@ -30,21 +30,14 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Models\Organization  $organization
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Organization $organization, StorePostRequest $request)
+    public function store(StorePostRequest $request)
     {
-        $user = Auth::user();
-
-        if ($user->organization_id !== $organization->id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $post = new Post();
         $post->fill($request->validated());
-        $post->author_id = $user->id;
+        $post->author_id = Auth::user()->id;
         $post->save();
 
         return new PostResource($post);
