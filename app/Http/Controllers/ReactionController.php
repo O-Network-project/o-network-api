@@ -14,6 +14,11 @@ use App\Http\Resources\ReactionResource;
 
 class ReactionController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Reaction::class, 'reaction');
+    }
+
     /**
      * Should return all the reactions of the database. But in this app MVP, no
      * user with any role can access that full list.
@@ -37,10 +42,6 @@ class ReactionController extends Controller
     public function store(Post $post, StoreOrUpdateReactionRequest $request)
     {
         $user = Auth::user();
-
-        if ($user->organization_id !== $post->organization->id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
 
         // A user can add only one reaction on a single post
         /** @var bool $conflict */
@@ -95,10 +96,6 @@ class ReactionController extends Controller
      */
     public function update(StoreOrUpdateReactionRequest $request, Reaction $reaction)
     {
-        if (Auth::user()->organization_id !== $reaction->organization->id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $reaction->update($request->validated());
         return new ReactionResource($reaction);
     }
@@ -111,10 +108,6 @@ class ReactionController extends Controller
      */
     public function destroy(Reaction $reaction)
     {
-        if (Auth::user()->organization_id !== $reaction->organization->id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $reaction->delete();
     }
 }
