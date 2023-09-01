@@ -24,6 +24,19 @@ class CommentPolicy extends ContentPolicy
     }
 
     /**
+     * Determine whether the user can view any comments from a post.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function viewAnyFromPost(User $user)
+    {
+        /** @var Post $post */
+        $post = Route::current()->parameter('post');
+        return self::sameOrganizationResponse($user, $post);
+    }
+
+    /**
      * Determine whether the user can view the comment.
      *
      * @param  \App\Models\User  $user
