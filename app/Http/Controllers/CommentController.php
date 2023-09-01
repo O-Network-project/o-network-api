@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Comment::class, 'comment');
+    }
+
     /**
      * Should return all the comments of the database. But in this app MVP, no
      * user with any role can access that full list.
@@ -34,15 +39,9 @@ class CommentController extends Controller
      */
     public function store(Post $post, StoreCommentRequest $request)
     {
-        $user = Auth::user();
-
-        if ($user->organization_id !== $post->organization->id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $comment = new Comment();
         $comment->fill($request->validated());
-        $comment->author_id = $user->id;
+        $comment->author_id = Auth::user()->id;
         $comment->post_id = $post->id;
         $comment->save();
 
@@ -80,10 +79,6 @@ class CommentController extends Controller
      */
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
-        if (Auth::user()->organization_id !== $comment->organization->id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $comment->update($request->validated());
     }
 
@@ -95,10 +90,6 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        if (Auth::user()->organization_id !== $comment->organization->id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $comment->delete();
     }
 }
