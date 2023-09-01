@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Post;
 use App\Models\User;
 use App\Models\Reaction;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,19 @@ class ReactionPolicy extends ContentPolicy
     public function viewAny(User $user)
     {
         return true;
+    }
+
+    /**
+     * Determine whether the user can view any reactions from a post.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function viewAnyFromPost(User $user)
+    {
+        /** @var Post $post */
+        $post = Route::current()->parameter('post');
+        return self::sameOrganizationResponse($user, $post);
     }
 
     /**

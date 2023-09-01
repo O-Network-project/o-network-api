@@ -19,6 +19,37 @@ class ReactionController extends Controller
         $this->authorizeResource(Reaction::class, 'reaction');
     }
 
+
+    /**
+     * Override the default mapping of the resource policies methods to add our
+     * custom showPostReactions one (the resourceAbilityMap() method comes
+     * from the AuthorizesRequests trait, imported in the Controller parent
+     * class).
+     *
+     * @return array
+     */
+    protected function resourceAbilityMap()
+    {
+        return array_merge(parent::resourceAbilityMap(), [
+            'showPostReactions' => 'viewAnyFromPost'
+        ]);
+    }
+
+    /**
+     * Override the default list of the policy methods that cannot receive an
+     * instantiated model to add our custom showPostReactions method (the
+     * resourceMethodsWithoutModels() method comes from the AuthorizesRequests
+     * trait, imported in the Controller parent class).
+     *
+     * @return array
+     */
+    protected function resourceMethodsWithoutModels()
+    {
+        return array_merge(parent::resourceMethodsWithoutModels(), [
+            'showPostReactions'
+        ]);
+    }
+
     /**
      * Should return all the reactions of the database. But in this app MVP, no
      * user with any role can access that full list.
