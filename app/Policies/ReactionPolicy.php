@@ -25,14 +25,20 @@ class ReactionPolicy extends ContentPolicy
 
     /**
      * Determine whether the user can view any reactions from a post.
+     * The post can be passed as an argument when used with the authorize()
+     * method, or it will be automatically extracted from the route.
      *
      * @param  \App\Models\User  $user
+     * @param  \App\Models\Post  $post
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function viewAnyFromPost(User $user)
+    public function viewAnyFromPost(User $user, ?Post $post = null)
     {
-        /** @var Post $post */
-        $post = Route::current()->parameter('post');
+        if (!$post) {
+            /** @var Post $post */
+            $post = Route::current()->parameter('post');
+        }
+
         return self::sameOrganizationResponse($user, $post);
     }
 
@@ -50,14 +56,20 @@ class ReactionPolicy extends ContentPolicy
 
     /**
      * Determine whether the user can create reactions.
+     * The post can be passed as an argument when used with the authorize()
+     * method, or it will be automatically extracted from the route.
      *
      * @param  \App\Models\User  $user
+     * @param  \App\Models\Post  $post
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function create(User $user)
+    public function create(User $user, ?Post $post = null)
     {
-        /** @var Post $post */
-        $post = Route::current()->parameter('post');
+        if (!$post) {
+            /** @var Post $post */
+            $post = Route::current()->parameter('post');
+        }
+
         return self::sameOrganizationResponse($user, $post);
     }
 
