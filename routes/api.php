@@ -26,12 +26,7 @@ Route::prefix('/organizations')->controller(OrganizationController::class)->grou
 
     Route::middleware('auth')->group(function () {
         Route::get('/', 'index')->name('organizations');
-
-        Route::prefix('/{organization}')->group(function () {
-            Route::get('/', 'show')->name('organization');
-            Route::patch('/', 'update')->name('update_organization');
-            Route::delete('/', 'destroy')->name('delete_organization');
-        });
+        Route::get('/{organization}', 'show')->name('organization');
     });
 });
 

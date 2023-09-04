@@ -89,29 +89,4 @@ class OrganizationController extends Controller
     {
         return new OrganizationResource($organization);
     }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Organization  $organization
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateOrganizationRequest $request, Organization $organization)
-    {
-        $this->checkNameConflict($request, $organization);
-
-        $organization->update($request->validated());
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Organization  $organization
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Organization $organization)
-    {
-        $organization->delete();
-    }
 }
