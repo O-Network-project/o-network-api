@@ -52,8 +52,8 @@ class PostController extends Controller
     }
 
     /**
-     * Should return all the posts of the database. But in this app MVP, no user
-     * with any role can access that full list.
+     * Return all the posts of the database. But in this app MVP, no user
+     * with any role can access that full list, it's blocked by the PostPolicy.
      * This method is only here to avoid an error when requesting the /posts URI
      * with the GET verb.
      *
@@ -61,7 +61,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        return response(null, 403);
+        return new PostCollection(Post::all());
     }
 
     /**

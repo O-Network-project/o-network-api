@@ -48,8 +48,9 @@ class CommentController extends Controller
     }
 
     /**
-     * Should return all the comments of the database. But in this app MVP, no
-     * user with any role can access that full list.
+     * Return all the comments of the database. But in this app MVP, no user
+     * with any role can access that full list, it's blocked by the
+     * CommentPolicy.
      * This method is only here to avoid an error when requesting the /comments
      * URI with the GET verb.
      *
@@ -57,7 +58,7 @@ class CommentController extends Controller
      */
     public function index()
     {
-        return response(null, 403);
+        return new CommentCollection(Comment::all());
     }
 
     /**

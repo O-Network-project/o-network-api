@@ -51,8 +51,9 @@ class ReactionController extends Controller
     }
 
     /**
-     * Should return all the reactions of the database. But in this app MVP, no
-     * user with any role can access that full list.
+     * Return all the reactions of the database. But in this app MVP, no user
+     * with any role can access that full list, it's blocked by the
+     * ReactionPolicy.
      * This method is only here to avoid an error when requesting the /reactions
      * URI with the GET verb.
      *
@@ -60,7 +61,7 @@ class ReactionController extends Controller
      */
     public function index()
     {
-        return response(null, 403);
+        return new ReactionCollection(Reaction::all());
     }
 
     /**

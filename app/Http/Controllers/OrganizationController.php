@@ -18,15 +18,17 @@ class OrganizationController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Return all the organizations of the database. But in this app MVP, no
+     * user with any role can access that full list, it's blocked by the
+     * OrganizationPolicy.
+     * This method is only here to avoid an error when requesting the
+     * /organizations URI with the GET verb.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        // In that app MVP, no user with any role can access the list of all
-        // organizations
-        return response(null, 403);
+        return Organization::all();
     }
 
     /**
