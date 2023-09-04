@@ -12,6 +12,11 @@ use Illuminate\Http\Response;
 
 class OrganizationController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Organization::class, 'organization');
+    }
+
     /**
      * Display a listing of the resource.
      *
