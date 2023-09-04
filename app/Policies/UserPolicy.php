@@ -25,14 +25,19 @@ class UserPolicy
 
     /**
      * Determine whether the user can view any users from an organization.
+     * The organization can be passed as an argument when used with the
+     * authorize() method, or it will be automatically extracted from the route.
      *
      * @param  \App\Models\User  $user
+     * @param  \App\Models\Organization  $organization
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function viewAnyFromOrganization(User $user)
+    public function viewAnyFromOrganization(User $user, ?Organization $organization = null)
     {
-        /** @var Organization $organization */
-        $organization = Route::current()->parameter('organization');
+        if (!$organization) {
+            /** @var Organization $organization */
+            $organization = Route::current()->parameter('organization');
+        }
 
         if ($user->organization_id !== $organization->id) {
             return Response::deny("The authenticated user doesn't belong to this organization");
