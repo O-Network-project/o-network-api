@@ -12,9 +12,45 @@ use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Comment::class, 'comment');
+    }
+
     /**
-     * Should return all the comments of the database. But in this app MVP, no
-     * user with any role can access that full list.
+     * Override the default mapping of the resource policies methods to add our
+     * custom showPostComments method (the resourceAbilityMap() method comes
+     * from the AuthorizesRequests trait, imported in the Controller parent
+     * class).
+     *
+     * @return array
+     */
+    protected function resourceAbilityMap()
+    {
+        return array_merge(parent::resourceAbilityMap(), [
+            'showPostComments' => 'viewAnyFromPost'
+        ]);
+    }
+
+    /**
+     * Override the default list of the policy methods that cannot receive an
+     * instantiated model to add our custom showPostComments one (the
+     * resourceMethodsWithoutModels() method comes from the AuthorizesRequests
+     * trait, imported in the Controller parent class).
+     *
+     * @return array
+     */
+    protected function resourceMethodsWithoutModels()
+    {
+        return array_merge(parent::resourceMethodsWithoutModels(), [
+            'showPostComments'
+        ]);
+    }
+
+    /**
+     * Return all the comments of the database. But in this app MVP, no user
+     * with any role can access that full list, it's blocked by the
+     * CommentPolicy.
      * This method is only here to avoid an error when requesting the /comments
      * URI with the GET verb.
      *
@@ -22,7 +58,7 @@ class CommentController extends Controller
      */
     public function index()
     {
-        return response(null, 403);
+        return new CommentCollection(Comment::all());
     }
 
     /**
@@ -34,15 +70,9 @@ class CommentController extends Controller
      */
     public function store(Post $post, StoreCommentRequest $request)
     {
-        $user = Auth::user();
-
-        if ($user->organization_id !== $post->author->organization_id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $comment = new Comment();
         $comment->fill($request->validated());
-        $comment->author_id = $user->id;
+        $comment->author_id = Auth::user()->id;
         $comment->post_id = $post->id;
         $comment->save();
 
@@ -80,10 +110,6 @@ class CommentController extends Controller
      */
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
-        if (Auth::user()->organization_id !== $comment->post->author->organization_id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $comment->update($request->validated());
     }
 
@@ -95,10 +121,6 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        if (Auth::user()->organization_id !== $comment->post->author->organization_id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $comment->delete();
     }
 }

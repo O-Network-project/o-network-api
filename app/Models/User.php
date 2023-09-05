@@ -50,23 +50,38 @@ class User extends Authenticatable
         'role_id' => 1
     ];
 
-    public function organization() {
+    /**
+     * Return true if the user has an admin role, else false.
+     *
+     * @return boolean
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role_id === 2;
+    }
+
+    public function organization()
+    {
         return $this->belongsTo(Organization::class);
     }
 
-    public function role() {
+    public function role()
+    {
         return $this->belongsTo(Role::class);
     }
 
-    public function posts() {
+    public function posts()
+    {
         return $this->hasMany(Post::class, 'author_id');
     }
 
-    public function comments() {
+    public function comments()
+    {
         return $this->hasMany(Comment::class, 'author_id');
     }
 
-    public function reactions() {
+    public function reactions()
+    {
         return $this->hasMany(Reaction::class, 'author_id');
     }
 }

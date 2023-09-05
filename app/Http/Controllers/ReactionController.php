@@ -14,9 +14,46 @@ use App\Http\Resources\ReactionResource;
 
 class ReactionController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Reaction::class, 'reaction');
+    }
+
+
     /**
-     * Should return all the reactions of the database. But in this app MVP, no
-     * user with any role can access that full list.
+     * Override the default mapping of the resource policies methods to add our
+     * custom showPostReactions one (the resourceAbilityMap() method comes
+     * from the AuthorizesRequests trait, imported in the Controller parent
+     * class).
+     *
+     * @return array
+     */
+    protected function resourceAbilityMap()
+    {
+        return array_merge(parent::resourceAbilityMap(), [
+            'showPostReactions' => 'viewAnyFromPost'
+        ]);
+    }
+
+    /**
+     * Override the default list of the policy methods that cannot receive an
+     * instantiated model to add our custom showPostReactions method (the
+     * resourceMethodsWithoutModels() method comes from the AuthorizesRequests
+     * trait, imported in the Controller parent class).
+     *
+     * @return array
+     */
+    protected function resourceMethodsWithoutModels()
+    {
+        return array_merge(parent::resourceMethodsWithoutModels(), [
+            'showPostReactions'
+        ]);
+    }
+
+    /**
+     * Return all the reactions of the database. But in this app MVP, no user
+     * with any role can access that full list, it's blocked by the
+     * ReactionPolicy.
      * This method is only here to avoid an error when requesting the /reactions
      * URI with the GET verb.
      *
@@ -24,7 +61,7 @@ class ReactionController extends Controller
      */
     public function index()
     {
-        return response(null, 403);
+        return new ReactionCollection(Reaction::all());
     }
 
     /**
@@ -37,10 +74,6 @@ class ReactionController extends Controller
     public function store(Post $post, StoreOrUpdateReactionRequest $request)
     {
         $user = Auth::user();
-
-        if ($user->organization_id !== $post->author->organization_id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
 
         // A user can add only one reaction on a single post
         /** @var bool $conflict */
@@ -95,10 +128,6 @@ class ReactionController extends Controller
      */
     public function update(StoreOrUpdateReactionRequest $request, Reaction $reaction)
     {
-        if (Auth::user()->organization_id !== $reaction->post->author->organization_id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $reaction->update($request->validated());
         return new ReactionResource($reaction);
     }
@@ -111,10 +140,6 @@ class ReactionController extends Controller
      */
     public function destroy(Reaction $reaction)
     {
-        if (Auth::user()->organization_id !== $reaction->post->author->organization_id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $reaction->delete();
     }
 }

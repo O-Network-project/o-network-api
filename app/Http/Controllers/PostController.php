@@ -14,9 +14,46 @@ use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Post::class, 'post');
+    }
+
     /**
-     * Should return all the posts of the database. But in this app MVP, no user
-     * with any role can access that full list.
+     * Override the default mapping of the resource policies methods to add our
+     * custom showOrganizationPosts and showUserPosts methods
+     * (the resourceAbilityMap() method comes from the AuthorizesRequests trait, imported in
+     * the Controller parent class).
+     *
+     * @return array
+     */
+    protected function resourceAbilityMap()
+    {
+        return array_merge(parent::resourceAbilityMap(), [
+            'showOrganizationPosts' => 'viewAnyFromOrganization',
+            'showUserPosts' => 'viewAnyFromUser'
+        ]);
+    }
+
+    /**
+     * Override the default list of the policy methods that cannot receive an
+     * instantiated model to add our custom showOrganizationPosts and
+     * showUserPosts ones (the resourceMethodsWithoutModels() method comes from
+     * the AuthorizesRequests trait, imported in the Controller parent class).
+     *
+     * @return array
+     */
+    protected function resourceMethodsWithoutModels()
+    {
+        return array_merge(parent::resourceMethodsWithoutModels(), [
+            'showOrganizationPosts',
+            'showUserPosts'
+        ]);
+    }
+
+    /**
+     * Return all the posts of the database. But in this app MVP, no user
+     * with any role can access that full list, it's blocked by the PostPolicy.
      * This method is only here to avoid an error when requesting the /posts URI
      * with the GET verb.
      *
@@ -24,7 +61,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        return response(null, 403);
+        return new PostCollection(Post::all());
     }
 
     /**

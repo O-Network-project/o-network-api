@@ -13,16 +13,53 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(User::class, 'user');
+    }
+
     /**
-     * Display a listing of the resource.
+     * Override the default mapping of the resource policies methods to add our
+     * custom showOrganizationUsers and showProfilePicture methods
+     * (the resourceAbilityMap() method comes from the AuthorizesRequests trait, imported in
+     * the Controller parent class).
+     *
+     * @return array
+     */
+    protected function resourceAbilityMap()
+    {
+        return array_merge(parent::resourceAbilityMap(), [
+            'showOrganizationUsers' => 'viewAnyFromOrganization',
+            'showProfilePicture' => 'view'
+        ]);
+    }
+
+    /**
+     * Override the default list of the policy methods that cannot receive an
+     * instantiated model to add our custom showOrganizationUsers one (the
+     * resourceMethodsWithoutModels() method comes from the AuthorizesRequests
+     * trait, imported in the Controller parent class).
+     *
+     * @return array
+     */
+    protected function resourceMethodsWithoutModels()
+    {
+        return array_merge(parent::resourceMethodsWithoutModels(), [
+            'showOrganizationUsers'
+        ]);
+    }
+
+    /**
+     * Return all the users of the database. But in this app MVP, no user
+     * with any role can access that full list, it's blocked by the UserPolicy.
+     * This method is only here to avoid an error when requesting the /users URI
+     * with the GET verb.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        // In that app MVP, no user with any role can access the list of all
-        // users
-        return response(null, 403);
+        return new UserCollection(User::all());
     }
 
     /**

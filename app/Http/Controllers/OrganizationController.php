@@ -12,16 +12,23 @@ use Illuminate\Http\Response;
 
 class OrganizationController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Organization::class, 'organization');
+    }
+
     /**
-     * Display a listing of the resource.
+     * Return all the organizations of the database. But in this app MVP, no
+     * user with any role can access that full list, it's blocked by the
+     * OrganizationPolicy.
+     * This method is only here to avoid an error when requesting the
+     * /organizations URI with the GET verb.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        // In that app MVP, no user with any role can access the list of all
-        // organizations
-        return response(null, 403);
+        return Organization::all();
     }
 
     /**
@@ -88,30 +95,5 @@ class OrganizationController extends Controller
     public function show(Organization $organization)
     {
         return new OrganizationResource($organization);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Organization  $organization
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateOrganizationRequest $request, Organization $organization)
-    {
-        $this->checkNameConflict($request, $organization);
-
-        $organization->update($request->validated());
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Organization  $organization
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Organization $organization)
-    {
-        $organization->delete();
     }
 }
