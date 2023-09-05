@@ -24,9 +24,6 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules()
     {
-        // Email, password and organization_id are fillable fields of the User
-        // entity, but they are not editable once set. So the "prohibited" rule
-        // is necessary to avoir unauthorized modification.
         return [
             'name' => ['sometimes', 'required', 'string', 'max:50'],
             'surname' => ['sometimes', 'required', 'string', 'max:50'],
