@@ -2,6 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,8 +15,36 @@ class UpdateUserRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(Request $request)
     {
+        /** @var User $currentUser */
+        $currentUser = Auth::user();
+
+        /** @var User $updatedUser */
+        $updatedUser = $request->route()->parameter('user');
+
+        $isSameUser = $currentUser->id === $updatedUser->id;
+
+        // If the updated user is not the authenticated one, he/she is
+        // necessarily the organization's admin (check the UserPolicy::update()
+        // method), no need to explicitly check it again.
+
+        // The two below conditions could have been merged, but they are way
+        // easier to understand when they are separated.
+
+        // Admins can only update one and only field from other users: disabled
+        if (
+            !$isSameUser
+            && (!$request->has('disabled') || count($request->post()) > 1)
+        ) {
+            return false;
+        }
+
+        // A user cannot disable itself, admin or not
+        if ($isSameUser && $request->has('disabled')) {
+            return false;
+        }
+
         return true;
     }
 
