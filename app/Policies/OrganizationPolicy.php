@@ -37,15 +37,4 @@ class OrganizationPolicy
 
         return true;
     }
-
-    /**
-     * Determine whether the user can create organizations.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
-    {
-        return true;
-    }
 }
