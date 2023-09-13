@@ -18,6 +18,24 @@ class OrganizationController extends Controller
     }
 
     /**
+     * Override the default mapping of the resource policies methods to remove
+     * the create one.
+     * This create action must be available for unauthenticated user, and so not
+     * being checked by the policies system. A policy requires an authentication
+     * to work, or it will systematically return a 403 error.
+     * (the resourceAbilityMap() method comes from the
+     * AuthorizesRequests trait, imported in the Controller parent class).
+     *
+     * @return array
+     */
+    protected function resourceAbilityMap(): array
+    {
+        return array_filter(parent::resourceAbilityMap(), function ($ability) {
+            return $ability !== 'create';
+        });
+    }
+
+    /**
      * Return all the organizations of the database. But in this app MVP, no
      * user with any role can access that full list, it's blocked by the
      * OrganizationPolicy.

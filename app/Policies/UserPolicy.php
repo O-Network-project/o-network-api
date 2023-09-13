@@ -63,17 +63,6 @@ class UserPolicy
     }
 
     /**
-     * Determine whether the user can create users.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
-    {
-        return true;
-    }
-
-    /**
      * Determine whether the user can update the user.
      *
      * @param  \App\Models\User  $user

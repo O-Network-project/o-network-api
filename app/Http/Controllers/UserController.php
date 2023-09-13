@@ -20,7 +20,11 @@ class UserController extends Controller
 
     /**
      * Override the default mapping of the resource policies methods to add our
-     * custom showOrganizationUsers and showProfilePicture methods
+     * custom showOrganizationUsers and showProfilePicture methods, and also to
+     * remove the create one.
+     * This create action must be available for unauthenticated user, and so not
+     * being checked by the policies system. A policy requires an authentication
+     * to work, or it will systematically return a 403 error.
      * (the resourceAbilityMap() method comes from the AuthorizesRequests trait, imported in
      * the Controller parent class).
      *
@@ -28,7 +32,11 @@ class UserController extends Controller
      */
     protected function resourceAbilityMap()
     {
-        return array_merge(parent::resourceAbilityMap(), [
+        $resourceAbilityMap = array_filter(parent::resourceAbilityMap(), function ($ability) {
+            return $ability !== 'create';
+        });
+
+        return array_merge($resourceAbilityMap, [
             'showOrganizationUsers' => 'viewAnyFromOrganization',
             'showProfilePicture' => 'view'
         ]);
