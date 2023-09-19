@@ -130,8 +130,16 @@ class UserController extends Controller
     {
         $inputs = $request->validated();
 
-        if ($request->hasFile('profilePicture')) {
+        $profilePictureDeleted = array_key_exists('profile_picture', $inputs)
+            && $inputs['profile_picture'] === null;
+
+        // If the user asked to remove its profile picture or he/shed sent a new
+        // one, the old picture must be deleted
+        if ($profilePictureDeleted || $request->hasFile('profilePicture')) {
             Storage::disk('public')->delete("/profiles-pictures/$user->profile_picture");
+        }
+
+        if ($request->hasFile('profilePicture')) {
             $inputs['profile_picture'] = $this->storeProfilePicture($request->file('profilePicture'));
         }
 
