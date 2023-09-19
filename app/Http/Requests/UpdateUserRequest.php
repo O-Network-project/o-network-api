@@ -74,7 +74,16 @@ class UpdateUserRequest extends FormRequest
     {
         $request = parent::validated();
 
-        if ($this->profilePicture) {
+        // There is 3 possible scenarios with the profile picture: not provided,
+        // null (which means "deleted") or string. So array_key_exists() is used
+        // here for the following reasons:
+        // - isset() returns false if the key is undefined or null
+        // - with requests properties ($this->profilePicture for example) there
+        //   is no difference when the property doesn't exist or is null: null
+        //   is returned in any case
+        // - array_key_exists() is perfect because it only checks the existence
+        //   of the key, no matter the value
+        if (array_key_exists('profilePicture', $request)) {
             $request['profile_picture'] = $this->profilePicture;
         }
 
