@@ -26,24 +26,6 @@ class OrganizationNameValidationTest extends TestCase
         return $string;
     }
 
-    public function test_valid_organization_name_can_pass(): void
-    {
-        $response = $this->get(route(self::ROUTE, [
-            'name' => "Test"
-        ]));
-
-        $response->assertOk();
-    }
-
-    public function test_validation_does_not_create_an_organization(): void
-    {
-        $this->get(route(self::ROUTE, [
-            'name' => "Test"
-        ]));
-
-        $this->assertCount(0, Organization::all());
-    }
-
     public function test_name_is_required(): void
     {
         $response = $this->get(route(self::ROUTE));
@@ -85,5 +67,23 @@ class OrganizationNameValidationTest extends TestCase
         ]));
 
         $response->assertStatus(Response::HTTP_CONFLICT);
+    }
+
+    public function test_validation_does_not_create_an_organization(): void
+    {
+        $this->get(route(self::ROUTE, [
+            'name' => "Test"
+        ]));
+
+        $this->assertCount(0, Organization::all());
+    }
+
+    public function test_valid_organization_name_can_pass(): void
+    {
+        $response = $this->get(route(self::ROUTE, [
+            'name' => "Test"
+        ]));
+
+        $response->assertOk();
     }
 }
