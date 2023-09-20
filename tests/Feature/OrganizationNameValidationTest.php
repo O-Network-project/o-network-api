@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Organization;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\Response;
 use Tests\TestCase;
 
 class OrganizationNameValidationTest extends TestCase
@@ -69,5 +70,20 @@ class OrganizationNameValidationTest extends TestCase
             'name' => $this->generateRandomString(51)
         ]));
         $response->assertJsonValidationErrorFor('name');
+    }
+
+    public function test_name_must_be_unique(): void
+    {
+        $name = "Test";
+
+        // We create an organization directly in database first...
+        Organization::create(['name' => $name]);
+
+        // ... and we use the same name to create a conflict
+        $response = $this->get(route(self::ROUTE, [
+            'name' => $name
+        ]));
+
+        $response->assertStatus(Response::HTTP_CONFLICT);
     }
 }
