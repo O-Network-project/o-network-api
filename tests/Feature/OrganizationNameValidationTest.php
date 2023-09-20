@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Organization;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -19,5 +20,14 @@ class OrganizationNameValidationTest extends TestCase
         ]));
 
         $response->assertOk();
+    }
+
+    public function test_validation_does_not_create_an_organization(): void
+    {
+        $this->get(route(self::ROUTE, [
+            'name' => "Test"
+        ]));
+
+        $this->assertCount(0, Organization::all());
     }
 }
