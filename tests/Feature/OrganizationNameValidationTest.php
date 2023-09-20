@@ -10,8 +10,20 @@ use Tests\TestCase;
 class OrganizationNameValidationTest extends TestCase
 {
     use RefreshDatabase;
+    use WithFaker;
 
     private const ROUTE = 'validate_organization';
+
+    private function generateRandomString($length)
+    {
+        $string = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $string .= $this->faker->randomLetter();
+        }
+
+        return $string;
+    }
 
     public function test_valid_organization_name_can_pass(): void
     {
@@ -43,6 +55,19 @@ class OrganizationNameValidationTest extends TestCase
             'name' => ['array of string is not a string']
         ]));
 
+        $response->assertJsonValidationErrorFor('name');
+    }
+
+    public function test_name_length_must_be_50_at_most(): void
+    {
+        $response = $this->get(route(self::ROUTE, [
+            'name' => $this->generateRandomString(50)
+        ]));
+        $response->assertOk();
+
+        $response = $this->get(route(self::ROUTE, [
+            'name' => $this->generateRandomString(51)
+        ]));
         $response->assertJsonValidationErrorFor('name');
     }
 }
