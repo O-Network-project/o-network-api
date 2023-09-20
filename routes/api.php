@@ -77,7 +77,7 @@ Route::middleware('logout_disabled_user')->group(function () {
     // Comment model routes
     Route::controller(CommentController::class)->middleware('auth')->group(function () {
         Route::prefix('/comments')->group(function () {
-            Route::get('/', 'index')->name('comments')->can('viewAny', Comment::class);
+            Route::get('/', 'index')->name('comments');
 
             Route::prefix('/{comment}')->group(function () {
                 Route::get('/', 'show')->name('comment');
