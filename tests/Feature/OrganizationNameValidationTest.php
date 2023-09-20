@@ -30,4 +30,10 @@ class OrganizationNameValidationTest extends TestCase
 
         $this->assertCount(0, Organization::all());
     }
+
+    public function test_name_is_required(): void
+    {
+        $response = $this->get(route(self::ROUTE));
+        $response->assertJsonValidationErrorFor('name');
+    }
 }
