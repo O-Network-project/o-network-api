@@ -36,4 +36,13 @@ class OrganizationNameValidationTest extends TestCase
         $response = $this->get(route(self::ROUTE));
         $response->assertJsonValidationErrorFor('name');
     }
+
+    public function test_name_must_be_a_string(): void
+    {
+        $response = $this->get(route(self::ROUTE, [
+            'name' => ['array of string is not a string']
+        ]));
+
+        $response->assertJsonValidationErrorFor('name');
+    }
 }
