@@ -10,6 +10,7 @@ To run this project on your machine, you will need:
 - PHP >= 7.0
 - Composer >= 2
 - MySql or MariaDB
+- the SQLite driver enabled in your php.ini (for tests only)
 
 ### Procedure
 
