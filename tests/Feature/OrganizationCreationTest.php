@@ -70,4 +70,14 @@ class OrganizationCreationTest extends TestCase
 
         $response->assertStatus(Response::HTTP_CONFLICT);
     }
+
+    public function test_user_can_create_an_organization(): void
+    {
+        $response = $this->post(route(self::ROUTE), [
+            'name' => "Test"
+        ]);
+
+        $response->assertCreated();
+        $this->assertCount(1, Organization::all());
+    }
 }
