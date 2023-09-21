@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Organization;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Response;
@@ -69,6 +70,22 @@ class OrganizationCreationTest extends TestCase
         ]);
 
         $response->assertStatus(Response::HTTP_CONFLICT);
+    }
+
+    public function test_timestamps_cannot_be_forced(): void
+    {
+        $pastDate = Carbon::create('1970-01-01 00:00:00');
+
+        $this->post(route(self::ROUTE), [
+            'name' => "Test",
+            'created_at' => $pastDate->toDateTimeString(),
+            'updated_at' => $pastDate->toDateTimeString(),
+        ]);
+
+        $organization = Organization::first();
+
+        $this->assertFalse($pastDate->equalTo($organization->created_at));
+        $this->assertFalse($pastDate->equalTo($organization->updated_at));
     }
 
     public function test_user_can_create_an_organization(): void
