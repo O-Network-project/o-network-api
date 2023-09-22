@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Resources\OrganizationResource;
 use App\Models\Organization;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -96,5 +97,20 @@ class OrganizationCreationTest extends TestCase
 
         $response->assertCreated();
         $this->assertCount(1, Organization::all());
+    }
+
+    public function test_new_organization_is_returned_after_creation(): void
+    {
+        $response = $this->post(route(self::ROUTE), [
+            'name' => "Test"
+        ]);
+
+        $organizationResource = new OrganizationResource(Organization::first());
+
+        // The first parameter of assertExactJson() must be an array, so the
+        // toArray() method of resources class is perfect for that purpose. But
+        // it needs a Request in parameter, and its mandatory in tests. We don't
+        // have one here... so null is a good workaround.
+        $response->assertExactJson($organizationResource->toArray(null));
     }
 }
