@@ -24,6 +24,15 @@ class UserFactory extends Factory
         ];
     }
 
+    public function enabledMember()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'disabled' => false,
+            ];
+        });
+    }
+
     public function admin()
     {
         return $this->state(function (array $attributes) {
