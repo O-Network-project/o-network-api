@@ -34,4 +34,24 @@ class OrganizationVisibilityTest extends TestCase
         $response = $this->actingAs($user)->get(route(self::LIST_ROUTE));
         $response->assertForbidden();
     }
+
+    public function test_organization_is_only_visible_by_its_members(): void
+    {
+        // We create 2 organizations...
+        $organization1 = Organization::factory()->create();
+        $organization2 = Organization::factory()->create();
+
+        // ... but only 1 user, member of the organization 1...
+        /** @var User $userOfOrganization1 */
+        $userOfOrganization1 = User::factory()->for($organization1)->create();
+
+        // ... and we try accessing the organization 2 with this user of the
+        // organization 1...
+        $response = $this->actingAs($userOfOrganization1)->get(route(self::ITEM_ROUTE, [
+            'organization' => $organization2->id
+        ]));
+
+        // ... which should return a 403
+        $response->assertForbidden();
+    }
 }
