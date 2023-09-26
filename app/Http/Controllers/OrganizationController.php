@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use App\Http\Resources\OrganizationResource;
-use App\Http\Requests\StoreOrganizationRequest;
-use App\Http\Requests\UpdateOrganizationRequest;
-use App\Http\Requests\ValidateOrganizationRequest;
+use App\Http\Requests\OrganizationRequest;
 use Illuminate\Http\Response;
 
 class OrganizationController extends Controller
@@ -55,7 +53,7 @@ class OrganizationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreOrganizationRequest $request)
+    public function store(OrganizationRequest $request)
     {
         $this->checkNameConflict($request);
 
@@ -68,7 +66,7 @@ class OrganizationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function check(ValidateOrganizationRequest $request)
+    public function check(OrganizationRequest $request)
     {
         $this->checkNameConflict($request);
     }
