@@ -1,5 +1,6 @@
 <?php
 
+use App\Classes\Invitation\Invitation;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\InvitationController;
@@ -60,7 +61,11 @@ Route::middleware('logout_disabled_user')->group(function () {
 
     // Invitations
     Route::prefix('/invitations')->controller(InvitationController::class)->group(function () {
-        Route::post('/', 'store')->middleware('auth')->name('create_invitation');
+        Route::post('/', 'store')
+            ->middleware('auth')
+            ->can('create', Invitation::class)
+            ->name('create_invitation')
+        ;
     });
 
     // Post model routes
