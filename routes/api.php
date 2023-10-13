@@ -60,7 +60,7 @@ Route::middleware('logout_disabled_user')->group(function () {
 
     // Invitations
     Route::prefix('/invitations')->controller(InvitationController::class)->group(function () {
-        Route::post('/', 'store')->name('create_invitation');
+        Route::post('/', 'store')->middleware('auth')->name('create_invitation');
     });
 
     // Post model routes
