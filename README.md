@@ -65,6 +65,13 @@ REDIS_PORT=6379
 REDIS_CLIENT=predis
 ```
 
+To make sending mails work, you need to configure a mail server. You can use any you want, but the `.env.example` file is prefilled with some values for [Mailtrap](https://mailtrap.io). So the easy way is to create an account and use the credentials the Mailtrap dashboard provides in the `MAIL_USERNAME` and `MAIL_PASSWORD` values:
+
+```dotenv
+MAIL_USERNAME=aaaaaaa1111111
+MAIL_PASSWORD=bbbbbbb2222222
+```
+
 Finally, populate the database with the migrations and seed data:
 
 ```bash
