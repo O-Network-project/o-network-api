@@ -6,8 +6,10 @@ use App\Models\User;
 use Illuminate\Http\Response;
 use App\Http\Requests\StoreInvitationRequest;
 use App\Classes\Invitation\InvitationRepository;
+use App\Mail\InvitationMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Mail;
 
 class InvitationController extends Controller
 {
@@ -34,6 +36,10 @@ class InvitationController extends Controller
                 ->status(Response::HTTP_CONFLICT);
         }
 
-        return $repository->create($email);
+        // Create and send the invitation to the user
+        $invitation = $repository->create($email);
+        Mail::send(new InvitationMail($invitation));
+
+        return $invitation;
     }
 }
