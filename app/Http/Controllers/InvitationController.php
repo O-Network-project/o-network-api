@@ -36,9 +36,18 @@ class InvitationController extends Controller
                 ->status(Response::HTTP_CONFLICT);
         }
 
-        // Create and send the invitation to the user
+        // Create the invitation in the Redis database
         $invitation = $repository->create($email);
-        Mail::send(new InvitationMail($invitation));
+
+        try {
+            // Send the invitation to the user by email
+            Mail::send(new InvitationMail($invitation));
+        }
+        catch (\Exception $error) {
+            // If an error occurs when sending the email, the invitation should
+            // be deleted: it shouldn't exist if the email failed to be sent
+            $repository->delete($invitation);
+        }
 
         return $invitation;
     }

@@ -44,4 +44,13 @@ class InvitationRepository
             RedisHelper::getKeyExpirationDate($key)
         );
     }
+
+    /**
+     * Delete an invitation in Redis. Of course, if the email had been sent, it
+     * won't be deleted from the user mail inbox :)
+     */
+    public function delete(Invitation $invitation): void
+    {
+        Redis::del(self::PREFIX.$invitation->getToken());
+    }
 }
