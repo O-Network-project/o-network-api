@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Http\Response;
 use Illuminate\Cache\RateLimiting\Limit;
+use App\Classes\Invitation\InvitationRepository;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -45,6 +47,20 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
+        });
+
+        // As invitations are stored in Redis and not in the database, the
+        // route-model-binding feature of Eloquent models is not available
+        // natively. The below bind function makes it work.
+        Route::bind('invitation', function (string $token) {
+            $repository = new InvitationRepository();
+            $invitation = $repository->find($token);
+
+            if ($invitation === null) {
+                abort(Response::HTTP_NOT_FOUND);
+            }
+
+            return $invitation;
         });
 
         // The entities IDs must be integers; it avoids bad URL matching,
