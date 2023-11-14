@@ -43,6 +43,23 @@ class InvitationRepository
     }
 
     /**
+     * Get all invitations in Redis, as an array of Invitation instances.
+     *
+     * @return Invitation[]
+     */
+    public function findAll(): array
+    {
+        $keys = Redis::keys(self::PREFIX . '*');
+
+        return array_map(function ($key) {
+            // The token is the part after the ":" in the key
+            $token = explode(':', $key)[1];
+
+            return $this->find($token);
+        }, $keys);
+    }
+
+    /**
      * Create an invitation in Redis for the provided email in the current user
      * organization and return it as an Invitation instance. Generate the token
      * as a UUID.
