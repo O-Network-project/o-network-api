@@ -66,6 +66,10 @@ class Handler extends ExceptionHandler
                 if ($request->is('users/*')) {
                     $message = "User record not found.";
                 }
+
+                if ($request->is('invitations/*')) {
+                    $message = "Invitation record not found.";
+                }
             }
 
             return response()->json(['message' => $message], 404);
