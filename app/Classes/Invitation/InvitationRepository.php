@@ -21,6 +21,28 @@ class InvitationRepository
     private const PREFIX = 'invitation:';
 
     /**
+     * Get an invitation in Redis from its token, as an Invitation instance.
+     */
+    public function find(string $token): ?Invitation
+    {
+        $key = self::PREFIX.$token;
+
+        /** @var array{organizationId:int,email:string} */
+        $invitation = json_decode(Redis::get($key), true);
+
+        if ($invitation === null) {
+            return null;
+        }
+
+        return new Invitation(
+            $token,
+            $invitation['organizationId'],
+            $invitation['email'],
+            RedisHelper::getKeyExpirationDate($key)
+        );
+    }
+
+    /**
      * Create an invitation in Redis for the provided email in the current user
      * organization and return it as an Invitation instance. Generate the token
      * as a UUID.
