@@ -70,6 +70,9 @@ class RouteServiceProvider extends ServiceProvider
         Route::pattern('post', '[0-9]+');
         Route::pattern('comment', '[0-9]+');
         Route::pattern('reaction', '[0-9]+');
+
+        // Invitations are represented by tokens, which are UUIDs v4
+        Route::pattern('invitation', '^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$');
     }
 
     /**
