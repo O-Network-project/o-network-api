@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Invitation\Invitation;
 use App\Models\User;
 use Illuminate\Http\Response;
 use App\Http\Requests\StoreInvitationRequest;
@@ -13,6 +14,28 @@ use Illuminate\Support\Facades\Mail;
 
 class InvitationController extends Controller
 {
+    /**
+     * Return all the invitations.
+     *
+     * @param InvitationRepository $invitation
+     * @return \Illuminate\Http\Response
+     */
+    public function index(InvitationRepository $invitation)
+    {
+        return $invitation->findAll();
+    }
+
+    /**
+     * Return the specified invitation.
+     *
+     * @param  App\Classes\Invitation\Invitation  $invitation
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Invitation $invitation)
+    {
+        return $invitation;
+    }
+
     /**
      * Store a newly created invitation in storage.
      *

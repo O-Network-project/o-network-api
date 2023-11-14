@@ -61,6 +61,8 @@ Route::middleware('logout_disabled_user')->group(function () {
 
     // Invitations
     Route::prefix('/invitations')->controller(InvitationController::class)->group(function () {
+        Route::get('/', 'index')->name('invitations');
+        Route::get('/{invitation}', 'show')->name('invitation');
         Route::post('/', 'store')
             ->middleware('auth')
             ->can('create', Invitation::class)
