@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\Mail;
 class InvitationController extends Controller
 {
     /**
-     * Return all the invitations.
+     * Return all the invitations. But in this app MVP, no user with any role
+     * can access that full list, it's blocked by the InvitationsPolicy. This
+     * method is only here to avoid an error when requesting the /invitations
+     * URI with the GET verb.
      *
      * @param InvitationRepository $invitation
      * @return \Illuminate\Http\Response
