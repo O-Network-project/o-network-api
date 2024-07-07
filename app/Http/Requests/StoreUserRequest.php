@@ -25,13 +25,14 @@ class StoreUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => ['required', 'email', 'max:255', 'unique:users'],
+            'invitationToken' => ['filled', 'prohibits:email,organizationId', 'regex:/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/'],
+            'email' => ['required_without:invitationToken', 'email', 'max:255', 'unique:users'],
             'name' => ['required', 'string', 'max:50'],
             'surname' => ['required', 'string', 'max:50'],
             'password' => ['required', 'string', 'regex:/^(?=.*\d)(?=.*[!@#$%^?&*])(?=.*[a-zA-Z]).{8,}$/'],
             'job' => ['required', 'string', 'max:255'],
             'profilePicture' => ['nullable', 'file', 'image', 'dimensions:min_width=128,min_height=128'],
-            'organizationId' => ['required', 'integer', 'exists:organizations,id']
+            'organizationId' => ['required_without:invitationToken', 'integer', 'exists:organizations,id']
         ];
     }
 
@@ -43,10 +44,19 @@ class StoreUserRequest extends FormRequest
     {
         $request = parent::validated();
 
-        return array_merge($request, [
-            'password' => Hash::make($this->password),
-            'profile_picture' => $this->profilePicture,
-            'organization_id' => (int) $this->organizationId
-        ]);
+        $request['password'] = Hash::make($this->password);
+
+        if (array_key_exists('profilePicture', $request)) {
+            $request['profile_picture'] = $this->profilePicture;
+        }
+
+        // In the case of an invitation, the organization ID is not sent by the
+        // client. Sp this condition avoids getting 0 as an ID, due to the integer
+        // typecasting.
+        if (array_key_exists('organizationId', $request)) {
+            $request['organization_id'] = (int) $this->organizationId;
+        }
+
+        return $request;
     }
 }
