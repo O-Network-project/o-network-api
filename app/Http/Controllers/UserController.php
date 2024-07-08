@@ -10,6 +10,7 @@ use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use App\Classes\Invitation\InvitationRepository;
 
 class UserController extends Controller
 {
@@ -76,16 +77,27 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreUserRequest $request)
+    public function store(StoreUserRequest $request, InvitationRepository $invitationRepository)
     {
         $user = new User();
-        $user->fill($request->validated());
+        $userData = $request->validated();
+        $invitationToken = $request->input('invitationToken');
+        $invitation = null;
+
+        if ($invitationToken !== null) {
+            $invitation = $invitationRepository->find($invitationToken);
+
+            $userData['email'] = $invitation->getEmail();
+            $userData['organization_id'] = $invitation->getOrganizationId();
+        }
+
+        $user->fill($userData);
 
         if ($request->hasFile('profilePicture')) {
             $user->profile_picture = $this->storeProfilePicture($request->file('profilePicture'));
         }
 
-        $isOrganizationEmpty = User::where('organization_id', $request->get('organization_id'))->count() === 0;
+        $isOrganizationEmpty = User::where('organization_id', $user->organization_id)->count() === 0;
 
         // The first user of an organization is considered as the admin
         if ($isOrganizationEmpty) {
@@ -93,6 +105,10 @@ class UserController extends Controller
         }
 
         $user->save();
+
+        if ($invitation !== null) {
+            $invitationRepository->delete($invitation);
+        }
 
         return new UserResource($user);
     }
