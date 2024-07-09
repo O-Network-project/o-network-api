@@ -8,6 +8,7 @@ use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\Organization;
 use App\Models\User;
+use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use App\Classes\Invitation\InvitationRepository;
@@ -86,6 +87,18 @@ class UserController extends Controller
 
         if ($invitationToken !== null) {
             $invitation = $invitationRepository->find($invitationToken);
+
+            if ($invitation === null) {
+                // If there is no invitation with such token when treating this
+                // request, 2 possibilities:
+                // - (hacking scenario) direct POST request with a token that
+                //   never existed
+                // - (normal scenario) the invitation was still valid when
+                //   displaying the form, but not when sending it
+                // The normal scenario matters the most, so the 410 Gone status
+                // code is more appropriate than the 404 Not Found.
+                abort(Response::HTTP_GONE, "L'invitation a expiré. Veuillez contacter l'administrateur pour en demander une nouvelle.");
+            }
 
             $userData['email'] = $invitation->getEmail();
             $userData['organization_id'] = $invitation->getOrganizationId();
