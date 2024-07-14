@@ -120,7 +120,14 @@ class UserController extends Controller
         $user->save();
 
         if ($invitation !== null) {
-            $invitationRepository->delete($invitation);
+            // There is no limit on the number of invitations an administrator
+            // can send to a single user, so when the account is finally
+            // created, all related invitations must be deleted.
+            $allUserInvitations = $invitationRepository->findByEmail($user->email);
+
+            foreach ($allUserInvitations as $invitation) {
+                $invitationRepository->delete($invitation);
+            }
         }
 
         return new UserResource($user);

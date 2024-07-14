@@ -60,6 +60,23 @@ class InvitationRepository
     }
 
     /**
+     * Get all invitations for a specific email in Redis, as an array of
+     * Invitation instances.
+     * The performances are not ideal, as all the invitations must be retrieved
+     * from Redis and instantiated before being filtered. For scalability, the
+     * Redis query must be optimized using a new key format which contains the
+     * email, to be able to use the wildcard (the asterisk -> *).
+     *
+     * @return Invitation[]
+     */
+    public function findByEmail(string $email): array
+    {
+        return array_filter($this->findAll(), function (Invitation $invitation) use ($email) {
+            return $invitation->getEmail() === $email;
+        });
+    }
+
+    /**
      * Create an invitation in Redis for the provided email in the current user
      * organization and return it as an Invitation instance. Generate the token
      * as a UUID.
