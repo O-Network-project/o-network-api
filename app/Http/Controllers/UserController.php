@@ -172,7 +172,7 @@ class UserController extends Controller
         // If the user asked to remove its profile picture or he/shed sent a new
         // one, the old picture must be deleted
         if ($profilePictureDeleted || $request->hasFile('profilePicture')) {
-            Storage::disk('public')->delete("/profiles-pictures/$user->profile_picture");
+            $this->deleteProfilePicture($user);
         }
 
         if ($request->hasFile('profilePicture')) {
@@ -198,6 +198,25 @@ class UserController extends Controller
         $fileName = $file->hashName();
         $file->store('profiles-pictures', ['disk' => 'public']);
         return $fileName;
+    }
+
+    /**
+     * Delete the profile picture of a user in the
+     * /storage/app/public/profiles-pictures folder. Returns true when the
+     * suppression succeeded when the user has no profile picture to delete,
+     * else false.
+     *
+     * @param  \App\Models\User  $user
+     * @return bool
+     */
+    protected function deleteProfilePicture(User $user)
+    {
+        if ($user->profile_picture === null) {
+            return true;
+        }
+
+        return Storage::disk('public')
+            ->delete("/profiles-pictures/$user->profile_picture");
     }
 
     /**
