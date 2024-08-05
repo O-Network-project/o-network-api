@@ -110,14 +110,24 @@ class UserController extends Controller
             $user->profile_picture = $this->storeProfilePicture($request->file('profilePicture'));
         }
 
-        $isOrganizationEmpty = User::where('organization_id', $user->organization_id)->count() === 0;
+        try {
+            $isOrganizationEmpty = User::where('organization_id', $user->organization_id)->count() === 0;
 
-        // The first user of an organization is considered as the admin
-        if ($isOrganizationEmpty) {
-            $user->role_id = 2;
+            // The first user of an organization is considered as the admin
+            if ($isOrganizationEmpty) {
+                $user->role_id = 2;
+            }
+
+            $user->save();
         }
+        catch (\Exception $error) {
+            // If an error occurs after the storage of the profile picture but
+            // before saving the user in the database, the picture shouldn't be
+            // kept in the filesystem to avoid orphan files.
+            $this->deleteProfilePicture($user);
 
-        $user->save();
+            throw $error;
+        }
 
         if ($invitation !== null) {
             // There is no limit on the number of invitations an administrator
@@ -179,7 +189,18 @@ class UserController extends Controller
             $inputs['profile_picture'] = $this->storeProfilePicture($request->file('profilePicture'));
         }
 
-        $user->update($inputs);
+        try {
+            $user->update($inputs);
+        }
+        catch (\Exception $error) {
+            // If an error occurs when updating the path of the profile picture
+            // in the database, the picture shouldn't be kept in the filesystem
+            // to avoid orphan files.
+            $this->deleteProfilePicture($user);
+
+            throw $error;
+        }
+
         return new UserResource($user);
     }
 
