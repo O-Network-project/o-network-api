@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -66,16 +65,13 @@ class Handler extends ExceptionHandler
                 if ($request->is('users/*')) {
                     $message = "User record not found.";
                 }
+
+                if ($request->is('invitations/*')) {
+                    $message = "Invitation record not found.";
+                }
             }
 
             return response()->json(['message' => $message], 404);
-        });
-
-        // By default, a 403 error will return an exhaustive error trace, even
-        // in production mode. To avoid this, the below custom handler only
-        // returns the error message.
-        $this->renderable(function (AccessDeniedHttpException $e, Request $request) {
-            return response()->json(['message' => $e->getMessage()], $e->getStatusCode());
         });
     }
 }

@@ -1,7 +1,9 @@
 <?php
 
+use App\Classes\Invitation\Invitation;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\InvitationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrganizationController;
@@ -55,6 +57,17 @@ Route::middleware('logout_disabled_user')->group(function () {
     Route::prefix('/session')->controller(AuthController::class)->group(function () {
         Route::post('/', 'login')->name('login');
         Route::delete('/', 'logout')->name('logout');
+    });
+
+    // Invitations
+    Route::prefix('/invitations')->controller(InvitationController::class)->group(function () {
+        Route::get('/', 'index')->can('viewAny', Invitation::class)->name('invitations');
+        Route::get('/{invitation}', 'show')->middleware('guest')->name('invitation');
+        Route::post('/', 'store')
+            ->middleware('auth')
+            ->can('create', Invitation::class)
+            ->name('create_invitation')
+        ;
     });
 
     // Post model routes
