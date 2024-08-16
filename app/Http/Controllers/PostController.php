@@ -14,98 +14,127 @@ use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Post::class, 'post');
+    }
+
     /**
-     * Display a listing of the resource.
-     * @param  \App\Models\Organization  $organization
+     * Override the default mapping of the resource policies methods to add our
+     * custom showOrganizationPosts and showUserPosts methods
+     * (the resourceAbilityMap() method comes from the AuthorizesRequests trait, imported in
+     * the Controller parent class).
+     *
+     * @return array
+     */
+    protected function resourceAbilityMap()
+    {
+        return array_merge(parent::resourceAbilityMap(), [
+            'showOrganizationPosts' => 'viewAnyFromOrganization',
+            'showUserPosts' => 'viewAnyFromUser'
+        ]);
+    }
+
+    /**
+     * Override the default list of the policy methods that cannot receive an
+     * instantiated model to add our custom showOrganizationPosts and
+     * showUserPosts ones (the resourceMethodsWithoutModels() method comes from
+     * the AuthorizesRequests trait, imported in the Controller parent class).
+     *
+     * @return array
+     */
+    protected function resourceMethodsWithoutModels()
+    {
+        return array_merge(parent::resourceMethodsWithoutModels(), [
+            'showOrganizationPosts',
+            'showUserPosts'
+        ]);
+    }
+
+    /**
+     * Return all the posts of the database. But in this app MVP, no user
+     * with any role can access that full list, it's blocked by the PostPolicy.
+     * This method is only here to avoid an error when requesting the /posts URI
+     * with the GET verb.
+     *
      * @return \Illuminate\Http\Response
      */
-    public function index(Organization $organization)
+    public function index()
     {
-        return new PostCollection(Post::
-            join('users', 'posts.author_id', '=', 'users.id')
-            ->where('users.organization_id', $organization->id)
-            ->select('posts.*')
-            ->get()
-        );
+        return new PostCollection(Post::all());
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Models\Organization  $organization
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Organization $organization, StorePostRequest $request)
+    public function store(StorePostRequest $request)
     {
-        $user = Auth::user();
-
-        if ($user->organization_id !== $organization->id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $post = new Post();
-        $post->fill($request->all());
-        $post->author_id = $user->id;
+        $post->fill($request->validated());
+        $post->author_id = Auth::user()->id;
         $post->save();
 
         return new PostResource($post);
     }
 
     /**
-     * Display the specified resource.
+     * Return the specified post.
      *
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function show(Organization $organization, Post $post)
+    public function show(Post $post)
     {
-        // If the post is not in this organization, it's considered as not found
-        if ($post->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
         return new PostResource($post);
+    }
+
+    /**
+     * Returns the posts of the provided organization.
+     * @param  \App\Models\Organization  $organization
+     * @return \Illuminate\Http\Response
+     */
+    public function showOrganizationPosts(Organization $organization)
+    {
+        $posts = Post::
+            leftJoin('users', 'posts.author_id', '=', 'users.id')
+            ->where('users.organization_id', $organization->id)
+            ->select('posts.*')
+            ->orderBy('posts.created_at', 'desc')
+            ->paginate(10);
+
+
+        return new PostCollection($posts);
     }
 
     /**
      * Return the posts of a specific user.
      *
-     * @param  \App\Models\Organization  $organization
-     * @param  \App\Models\Post  $post
+     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function showUserPosts(Organization $organization, User $user)
+    public function showUserPosts(User $user)
     {
-        // If the user is not in this organization, it's considered as not found
-        if ($user->organization_id !== $organization->id) {
-            return abort(404);
-        }
+        $posts = Post::
+            where('posts.author_id', $user->id)
+            ->orderBy('posts.created_at', 'desc')
+            ->paginate(10);
 
-        return new PostCollection(Post::where('author_id', $user->id)->get());
+        return new PostCollection($posts);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Organization  $organization
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdatePostRequest $request, Organization $organization, Post $post)
+    public function update(UpdatePostRequest $request, Post $post)
     {
-        // If the post is not in this organization, it's considered as not found
-        if ($post->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
-        if (Auth::user()->organization_id !== $organization->id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
-        $post->update($request->all());
+        $post->update($request->validated());
     }
 
     /**
@@ -114,17 +143,8 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Organization $organization, Post $post)
+    public function destroy(Post $post)
     {
-        // If the post is not in this organization, it's considered as not found
-        if ($post->author->organization_id !== $organization->id) {
-            return abort(404);
-        }
-
-        if (Auth::user()->organization_id !== $organization->id) {
-            return response()->json(['message' => "The authenticated user doesn't belong to this organization"], 403);
-        }
-
         $post->delete();
     }
 }

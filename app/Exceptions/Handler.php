@@ -4,7 +4,6 @@ namespace App\Exceptions;
 
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Support\Facades\Log;
 use Throwable;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -47,16 +46,28 @@ class Handler extends ExceptionHandler
             // We need to check if a route matched first, to avoid returning
             // "Organization not found" for every request with a bad URL
             if ($request->route()) {
-                if ($request->is('api/organizations/*')) {
+                if ($request->is('organizations/*')) {
                     $message = "Organization record not found.";
                 }
 
-                if ($request->is('api/organizations/*/posts/*')) {
+                if ($request->is('posts/*')) {
                     $message = "Post record not found.";
                 }
 
-                if ($request->is('api/users/*') || $request->is('api/organizations/*/users/*')) {
+                if ($request->is('comments/*')) {
+                    $message = "Comment record not found.";
+                }
+
+                if ($request->is('reactions/*')) {
+                    $message = "Reaction record not found.";
+                }
+
+                if ($request->is('users/*')) {
                     $message = "User record not found.";
+                }
+
+                if ($request->is('invitations/*')) {
+                    $message = "Invitation record not found.";
                 }
             }
 

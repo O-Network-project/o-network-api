@@ -13,7 +13,13 @@ class Organization extends Model
         'name'
     ];
 
-    public function users() {
+    public function users()
+    {
         return $this->hasMany(User::class);
+    }
+
+    public function posts()
+    {
+        return $this->hasManyThrough(Post::class, User::class, null, 'author_id');
     }
 }
