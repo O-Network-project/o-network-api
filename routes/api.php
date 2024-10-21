@@ -57,6 +57,7 @@ Route::middleware('logout_disabled_user')->group(function () {
     Route::prefix('/session')->controller(AuthController::class)->group(function () {
         Route::post('/', 'login')->name('login');
         Route::delete('/', 'logout')->name('logout');
+        Route::get('/user', 'showSessionUser')->name('current_user');
     });
 
     // Invitations

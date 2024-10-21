@@ -48,4 +48,19 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
     }
+
+    /**
+     * Return the authenticated user in session, or an empty response with a 204
+     * No Content status code.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showSessionUser()
+    {
+        $user = Auth::user();
+
+        return $user ?
+            new UserResource($user) :
+            response()->noContent();
+    }
 }
