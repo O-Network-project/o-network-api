@@ -205,7 +205,7 @@ class UserController extends Controller
     }
 
     /**
-     * Store the profile picture in the /storage/app/public/profiles-pictures
+     * Store the profile picture in the /storage/app/public/profile-pictures
      * folder and returns the generated file name.
      *
      * @param  \Illuminate\Http\UploadedFile  $file
@@ -215,15 +215,15 @@ class UserController extends Controller
     {
         // Generating the file name outside the store() method allows to get it
         // without the parent folder name.
-        // "file-name.jpg" instead of "profiles-pictures/file-name.jpg"
+        // "file-name.jpg" instead of "profile-pictures/file-name.jpg"
         $fileName = $file->hashName();
-        $file->store('profiles-pictures', ['disk' => 'public']);
+        $file->store('profile-pictures', ['disk' => 'public']);
         return $fileName;
     }
 
     /**
      * Delete the profile picture of a user in the
-     * /storage/app/public/profiles-pictures folder. Returns true when the
+     * /storage/app/public/profile-pictures folder. Returns true when the
      * suppression succeeded when the user has no profile picture to delete,
      * else false.
      *
@@ -237,6 +237,6 @@ class UserController extends Controller
         }
 
         return Storage::disk('public')
-            ->delete("/profiles-pictures/$user->profile_picture");
+            ->delete("/profile-pictures/$user->profile_picture");
     }
 }

@@ -21,7 +21,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'surname' => $this->surname,
             'job' => $this->job,
-            'profilePicture' => $this->profile_picture ? Storage::disk('public')->url('/profiles-pictures/'.$this->profile_picture) : null,
+            'profilePicture' => $this->profile_picture ? Storage::disk('public')->url('/profile-pictures/'.$this->profile_picture) : null,
             'disabled' => $this->disabled,
             'organization' => new OrganizationResource($this->organization),
             'role' => $this->role
