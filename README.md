@@ -72,6 +72,12 @@ MAIL_USERNAME=aaaaaaa1111111
 MAIL_PASSWORD=bbbbbbb2222222
 ```
 
+A symbolic link between the root `/public` directory and the `/storage/app/public` one is needed for the server to deliver user profile pictures. Create it with the following command:
+
+```bash
+php artisan storage:link
+```
+
 Finally, populate the database with the migrations and seed data:
 
 ```bash
