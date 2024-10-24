@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class UserResource extends JsonResource
 {
@@ -21,7 +22,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'surname' => $this->surname,
             'job' => $this->job,
-            'profilePicture' => $this->profile_picture ? route('profile_picture', ['user' => $this->id]) : null,
+            'profilePicture' => $this->profile_picture ? Storage::disk('public')->url('/profiles-pictures/'.$this->profile_picture) : null,
             'disabled' => $this->disabled,
             'organization' => new OrganizationResource($this->organization),
             'role' => $this->role
