@@ -45,7 +45,7 @@ Create also the app key with the following command:
 php artisan key:generate
 ```
 
-Open the `.env` one, and set all the values prefixed with `DB_` to match your own database configuration. For example, with a database named `o_network`:
+Open the `.env` file, and set all the values prefixed with `DB_` to match your own database configuration. For example, with a database named `o_network`:
 
 ```dotenv
 DB_CONNECTION=mysql
