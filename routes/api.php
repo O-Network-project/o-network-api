@@ -44,7 +44,6 @@ Route::middleware('logout_disabled_user')->group(function () {
 
                 Route::prefix('/{user}')->group(function () {
                     Route::get('/', 'show')->name('user');
-                    Route::get('/profile-picture', 'showProfilePicture')->name('profile_picture');
                     Route::patch('/', 'update')->name('update_user');
                 });
             });
