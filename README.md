@@ -45,7 +45,7 @@ Create also the app key with the following command:
 php artisan key:generate
 ```
 
-Open the `.env` one, and set all the values prefixed with `DB_` to match your own database configuration. For example, with a database named `o_network`:
+Open the `.env` file, and set all the values prefixed with `DB_` to match your own database configuration. For example, with a database named `o_network`:
 
 ```dotenv
 DB_CONNECTION=mysql
@@ -70,6 +70,12 @@ To make sending mails work, you need to configure a mail server. You can use any
 ```dotenv
 MAIL_USERNAME=aaaaaaa1111111
 MAIL_PASSWORD=bbbbbbb2222222
+```
+
+A symbolic link between the root `/public` directory and the `/storage/app/public` one is needed for the server to deliver user profile pictures. Create it with the following command:
+
+```bash
+php artisan storage:link
 ```
 
 Finally, populate the database with the migrations and seed data:
