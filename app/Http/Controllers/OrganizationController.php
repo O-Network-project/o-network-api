@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\OrganizationResource;
 use App\Http\Requests\OrganizationRequest;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 
 class OrganizationController extends Controller
 {
@@ -96,9 +97,9 @@ class OrganizationController extends Controller
         $conflicts = $query->exists();
 
         if ($conflicts) {
-            response()
-                ->json(['message' => "The organization '$name' already exists."], Response::HTTP_CONFLICT)
-                ->throwResponse();
+            throw ValidationException::
+                withMessages(['name' => "The organization '$name' already exists."])
+                ->status(Response::HTTP_CONFLICT);
         }
     }
 
