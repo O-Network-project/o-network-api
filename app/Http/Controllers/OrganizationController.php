@@ -86,8 +86,7 @@ class OrganizationController extends Controller
      */
     private function checkNameConflict(Request $request, ?Organization $organization = null)
     {
-        $name = $request->input('name');
-        $query = Organization::where('name', $name);
+        $query = Organization::where('name', $request->input('name'));
 
         // In case of an update, avoids throwing the error if the concerned
         // organization kept the same name
@@ -99,7 +98,7 @@ class OrganizationController extends Controller
 
         if ($conflicts) {
             throw ValidationException::
-                withMessages(['name' => "The organization '$name' already exists."])
+                withMessages(['name' => "Cette organisation existe déjà. Merci de choisir un autre nom."])
                 ->status(Response::HTTP_CONFLICT);
         }
     }
