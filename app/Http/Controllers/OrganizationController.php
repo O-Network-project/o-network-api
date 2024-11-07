@@ -70,6 +70,7 @@ class OrganizationController extends Controller
     public function check(OrganizationRequest $request)
     {
         $this->checkNameConflict($request);
+        return response()->noContent();
     }
 
     /**
