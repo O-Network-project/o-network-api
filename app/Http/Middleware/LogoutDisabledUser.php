@@ -24,6 +24,12 @@ class LogoutDisabledUser
      */
     public function handle(Request $request, Closure $next)
     {
+        // If a disabled user logs out on its own, they should not receive any
+        // 401 error, so this middleware is ignored with this specific route
+        if ($request->route()->getName() === 'logout') {
+            return $next($request);
+        }
+
         /** @var ?User $user */
         $user = Auth::user();
 
