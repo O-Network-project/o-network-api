@@ -141,5 +141,6 @@ class ReactionController extends Controller
     public function destroy(Reaction $reaction)
     {
         $reaction->delete();
+        return response()->noContent();
     }
 }
