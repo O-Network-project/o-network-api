@@ -1,6 +1,6 @@
 <?php
 
-use Database\Seeders\RoleSeeder;
+use App\Models\Role;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,10 +20,10 @@ class CreateRolesTable extends Migration
             $table->string('name', 20)->unique();
         });
 
-        // As roles are not example data, this seeder is not run from the
-        // DatabaseSeeder but directly here, after the creation of the table
-        $seeder = new RoleSeeder();
-        $seeder->run();
+        Role::insert([
+            ['tag' => 'member', 'name' => 'Membre'],
+            ['tag' => 'admin', 'name' => 'Administrateur']
+        ]);
     }
 
     /**
