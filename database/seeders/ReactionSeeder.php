@@ -29,10 +29,11 @@ class ReactionSeeder extends Seeder
                     return $user->id === $post->author->id;
                 });
 
-                // Each seeded post will have between 0 and 15 reactions.
+                $reactionsLimit = rand(0, $otherUsers->count());
+
                 // Using a for loop instead of the count method allows the
                 // author to vary for each reaction.
-                for ($i = 0; $i < rand(0, 15); $i++) {
+                for ($i = 0; $i < $reactionsLimit; $i++) {
                     $author = $otherUsers->random();
 
                     Reaction::factory()
