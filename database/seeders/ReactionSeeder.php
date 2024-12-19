@@ -23,18 +23,23 @@ class ReactionSeeder extends Seeder
             $users = $organization->users;
 
             $organization->posts->each(function (Post $post) use ($users) {
-                // To get a more realistic set of reactions, none will have the
-                // same author than the parent post
-                $otherUsers = $users->reject(function (User $user) use ($post) {
-                    return $user->id === $post->author->id;
+                $possibleReactors = $users->reject(function (User $user) use ($post) {
+                    return (
+                        // To get a more realistic set of reactions, none will
+                        // have the same author as the parent post
+                        $user->id === $post->author->id
+
+                        // Users can only react once to a single post
+                        || $post->reactionAuthors->contains($user)
+                    );
                 });
 
-                $reactionsLimit = rand(0, $otherUsers->count());
+                $reactionsLimit = rand(0, $possibleReactors->count());
 
                 // Using a for loop instead of the count method allows the
                 // author to vary for each reaction.
                 for ($i = 0; $i < $reactionsLimit; $i++) {
-                    $author = $otherUsers->random();
+                    $author = $possibleReactors->random();
 
                     Reaction::factory()
                         ->for($post)
@@ -44,7 +49,7 @@ class ReactionSeeder extends Seeder
                     // Each user can only add one reaction per post; after the
                     // adding, the author must not be used again for the current
                     // post.
-                    $otherUsers = $otherUsers->reject(function (User $user) use ($author) {
+                    $possibleReactors = $possibleReactors->reject(function (User $user) use ($author) {
                         return $user->id === $author->id;
                     });
                 }
