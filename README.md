@@ -89,3 +89,5 @@ Now and every time you need to run the project, don't forget to run your databas
 ```bash
 php artisan serve
 ```
+
+SSL certificate: https://stackoverflow.com/a/32095378
