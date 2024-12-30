@@ -39,16 +39,18 @@ class UserFactory extends Factory
 
         return $this->state(function (array $attributes) use ($client, $query) {
             try {
+                echo "Fetching a sample user form randomuser.me API... ";
                 $response = $client->request($query);
+                echo "done.\n";
             }
             catch (TransportRequestException $e) {
-                echo "randomuser.me API is unreachable. Using FakerPHP "
+                echo "\nrandomuser.me API is unreachable. Using FakerPHP "
                     . "instead.\n";
 
                 return [];
             }
             catch (\Exception $e) {
-                echo "Error when requesting randomuser.me API. Using FakerPHP "
+                echo "\nError when requesting randomuser.me API. Using FakerPHP "
                     . "instead.\n";
 
                 return [];
@@ -62,11 +64,12 @@ class UserFactory extends Factory
                 'surname' => $randomUser['name']['last']
             ];
 
+            echo "Downloading the profile picture... ";
             $imageUrl = $randomUser['picture']['large'];
             $imageResponse = Http::get($imageUrl);
 
             if (!$imageResponse->successful()) {
-                echo "Error while downloading image from randomuser.me API. "
+                echo "\nError while downloading image from randomuser.me API. "
                     . "Sample user {$state['name']} {$state['surname']} won't "
                     . "have a profile picture.\n";
 
@@ -90,10 +93,12 @@ class UserFactory extends Factory
                 $state['profile_picture'] = $fileName;
             }
             catch (\Exception $e) {
-                echo "Error while storing image from randomuser.me API. Sample "
+                echo "\nError while storing image from randomuser.me API. Sample "
                     . "user {$state['name']} {$state['surname']} won't have a "
                     . "profile picture.\n";
             }
+
+            echo "done.\n";
 
             return $state;
         });
