@@ -2,11 +2,14 @@
 
 namespace Database\Factories;
 
+use Exception;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Kosv\RandomUser\Client\{Client, QueryBuilder};
+use Kosv\RandomUser\Exceptions\TransportRequestException;
 
 class UserFactory extends Factory
 {
@@ -35,11 +38,40 @@ class UserFactory extends Factory
         $query->setIncludeFields(['email', 'name', 'picture']);
 
         return $this->state(function (array $attributes) use ($client, $query) {
-            $response = $client->request($query);
+            try {
+                $response = $client->request($query);
+            }
+            catch (TransportRequestException $e) {
+                echo "randomuser.me API is unreachable. Using FakerPHP "
+                    . "instead.\n";
+
+                return [];
+            }
+            catch (\Exception $e) {
+                echo "Error when requesting randomuser.me API. Using FakerPHP "
+                    . "instead.\n";
+
+                return [];
+            }
+
             $randomUser = $response->getUsers()[0];
+
+            $state = [
+                'email' => $randomUser['email'],
+                'name' => $randomUser['name']['first'],
+                'surname' => $randomUser['name']['last']
+            ];
 
             $imageUrl = $randomUser['picture']['large'];
             $imageResponse = Http::get($imageUrl);
+
+            if (!$imageResponse->successful()) {
+                echo "Error while downloading image from randomuser.me API. "
+                    . "Sample user {$state['name']} {$state['surname']} won't "
+                    . "have a profile picture.\n";
+
+                return $state;
+            }
 
             $extension = pathinfo(
                 parse_url($imageUrl, PHP_URL_PATH),
@@ -49,17 +81,21 @@ class UserFactory extends Factory
             // Same algorithm as Laravel's hashName() method from UploadedFile
             $fileName = Str::random(40).'.'.$extension;
 
-            Storage::disk('public')->put(
-                "profile-pictures/$fileName",
-                $imageResponse->body()
-            );
+            try {
+                Storage::disk('public')->put(
+                    "profile-pictures/$fileName",
+                    $imageResponse->body()
+                );
 
-            return [
-                'email' => $randomUser['email'],
-                'name' => $randomUser['name']['first'],
-                'surname' => $randomUser['name']['last'],
-                'profile_picture' => $fileName,
-            ];
+                $state['profile_picture'] = $fileName;
+            }
+            catch (\Exception $e) {
+                echo "Error while storing image from randomuser.me API. Sample "
+                    . "user {$state['name']} {$state['surname']} won't have a "
+                    . "profile picture.\n";
+            }
+
+            return $state;
         });
     }
 
