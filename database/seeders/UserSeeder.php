@@ -28,10 +28,10 @@ class UserSeeder extends Seeder
             // multiple times without ending with multiple admins, as only 1
             // admin should exist in each organization
             if ($organization->users->where('role_id', 2)->count() === 0) {
-                User::factory()->admin()->for($organization)->create();
+                User::factory()->fromRandomUserMeApi()->admin()->for($organization)->create();
             }
 
-            User::factory()->for($organization)->count(10)->create();
+            User::factory()->fromRandomUserMeApi()->for($organization)->count(10)->create();
         });
     }
 }
