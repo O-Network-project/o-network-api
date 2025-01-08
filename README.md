@@ -78,6 +78,14 @@ A symbolic link between the root `/public` directory and the `/storage/app/publi
 php artisan storage:link
 ```
 
+The UserSeeder uses the randomuser.me API to generate sample users on development environment, and a SSL certificate is required to query it. [Click here](https://curl.se/ca/cacert.pem) to download this one from [the Curl website](https://curl.se/docs/caextract.html), and put it somewhere on your drive (in your `php` folder for example).
+Set the `curl.cainfo` and `openssl.cafil` settings to the path of your certificate, like this:
+
+```apache
+curl.cainfo ="C:\Program Files\php\cert\cacert.pem"
+openssl.cafile="C:\Program Files\php\cert\cacert.pem"
+```
+
 Finally, populate the database with the migrations and seed data:
 
 ```bash
@@ -89,5 +97,3 @@ Now and every time you need to run the project, don't forget to run your databas
 ```bash
 php artisan serve
 ```
-
-SSL certificate: https://stackoverflow.com/a/32095378
