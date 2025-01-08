@@ -33,30 +33,12 @@ class UserFactory extends Factory
 
     public function fromRandomUserMeApi()
     {
-        $client = new Client();
-        $query = new QueryBuilder();
-        $query->setIncludeFields(['email', 'name', 'picture']);
+        return $this->state(function (array $attributes) {
+            $randomUser = $this->fetchUserFromRandomUserMeApi();
 
-        return $this->state(function (array $attributes) use ($client, $query) {
-            try {
-                echo "Fetching a sample user form randomuser.me API... ";
-                $response = $client->request($query);
-                echo "done.\n";
-            }
-            catch (TransportRequestException $e) {
-                echo "\nrandomuser.me API is unreachable. Using FakerPHP "
-                    . "instead.\n";
-
+            if ($randomUser === null) {
                 return [];
             }
-            catch (\Exception $e) {
-                echo "\nError when requesting randomuser.me API. Using FakerPHP "
-                    . "instead.\n";
-
-                return [];
-            }
-
-            $randomUser = $response->getUsers()[0];
 
             $state = [
                 'email' => $randomUser['email'],
@@ -64,41 +46,11 @@ class UserFactory extends Factory
                 'surname' => $randomUser['name']['last']
             ];
 
-            echo "Downloading the profile picture... ";
-            $imageUrl = $randomUser['picture']['large'];
-            $imageResponse = Http::get($imageUrl);
+            $profilePicture = $this->storeRandomUserProfilePicture($randomUser);
 
-            if (!$imageResponse->successful()) {
-                echo "\nError while downloading image from randomuser.me API. "
-                    . "Sample user {$state['name']} {$state['surname']} won't "
-                    . "have a profile picture.\n";
-
-                return $state;
+            if ($profilePicture !== null) {
+                $state['profile_picture'] = $profilePicture;
             }
-
-            $extension = pathinfo(
-                parse_url($imageUrl, PHP_URL_PATH),
-                PATHINFO_EXTENSION
-            );
-
-            // Same algorithm as Laravel's hashName() method from UploadedFile
-            $fileName = Str::random(40).'.'.$extension;
-
-            try {
-                Storage::disk('public')->put(
-                    "profile-pictures/$fileName",
-                    $imageResponse->body()
-                );
-
-                $state['profile_picture'] = $fileName;
-            }
-            catch (\Exception $e) {
-                echo "\nError while storing image from randomuser.me API. Sample "
-                    . "user {$state['name']} {$state['surname']} won't have a "
-                    . "profile picture.\n";
-            }
-
-            echo "done.\n";
 
             return $state;
         });
@@ -121,5 +73,73 @@ class UserFactory extends Factory
                 'role_id' => 2,
             ];
         });
+    }
+
+    private function fetchUserFromRandomUserMeApi() {
+        $client = new Client();
+        $query = new QueryBuilder();
+        $query->setIncludeFields(['email', 'name', 'picture']);
+
+        try {
+            echo "Fetching a sample user form randomuser.me API... ";
+            $response = $client->request($query);
+            echo "done.\n";
+        }
+        catch (TransportRequestException $e) {
+            echo "\nrandomuser.me API is unreachable. Using FakerPHP "
+                . "instead.\n";
+
+            return null;
+        }
+        catch (\Exception $e) {
+            echo "\nError when requesting randomuser.me API. Using FakerPHP "
+                . "instead.\n";
+
+            return null;
+        }
+
+        return $response->getUsers()[0];
+    }
+
+    private function storeRandomUserProfilePicture(array $randomUser) {
+        echo "Downloading the profile picture... ";
+        $imageUrl = $randomUser['picture']['large'];
+        $imageResponse = Http::get($imageUrl);
+
+        if (!$imageResponse->successful()) {
+            echo "\nError while downloading image from randomuser.me API. "
+                . "Sample user {$randomUser['name']['first']} "
+                . "{$randomUser['name']['last']} won't have a profile "
+                . "picture.\n";
+
+            return null;
+        }
+
+        $extension = pathinfo(
+            parse_url($imageUrl, PHP_URL_PATH),
+            PATHINFO_EXTENSION
+        );
+
+        // Same algorithm as Laravel's hashName() method from UploadedFile
+        $fileName = Str::random(40).'.'.$extension;
+
+        try {
+            Storage::disk('public')->put(
+                "profile-pictures/$fileName",
+                $imageResponse->body()
+            );
+        }
+        catch (\Exception $e) {
+            echo "\nError while storing image from randomuser.me API. Sample "
+                . "user {$randomUser['name']['first']} "
+                . "{$randomUser['name']['last']} won't have a profile "
+                . "picture.\n";
+
+            return null;
+        }
+
+        echo "done.\n";
+
+        return $fileName;
     }
 }
