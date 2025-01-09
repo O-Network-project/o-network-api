@@ -25,7 +25,7 @@ class StoreOrUpdateReactionRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => ['required', 'string', 'exists:reactions_types,tag'],
+            'type' => ['required', 'string', 'exists:reactions_types,name'],
         ];
     }
 
@@ -37,7 +37,7 @@ class StoreOrUpdateReactionRequest extends FormRequest
     {
         $request = parent::validated();
 
-        $request['type_id'] = ReactionType::where('tag', $this->type)->first()->id;
+        $request['type_id'] = ReactionType::where('name', $this->type)->first()->id;
         return $request;
     }
 }
