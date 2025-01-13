@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\ReactionType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class CreateReactionsTypesTable extends Migration
@@ -20,7 +20,7 @@ class CreateReactionsTypesTable extends Migration
             $table->string('name', 10)->unique();
         });
 
-        ReactionType::insert([
+        DB::table('reactions_types')->insert([
             ['tag' => 'like', 'name' => "J'aime"],
             ['tag' => 'love', 'name' => "J'adore"],
             ['tag' => 'haha', 'name' => "Ha ha"],
