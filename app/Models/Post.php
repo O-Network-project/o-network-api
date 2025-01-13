@@ -37,4 +37,9 @@ class Post extends Model
     {
         return $this->hasMany(Reaction::class);
     }
+
+    public function reactionAuthors()
+    {
+        return $this->hasManyThrough(User::class, Reaction::class, 'post_id', 'id', null, 'author_id');
+    }
 }

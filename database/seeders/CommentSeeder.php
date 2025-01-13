@@ -23,10 +23,11 @@ class CommentSeeder extends Seeder
             $users = $organization->users;
 
             $organization->posts->each(function (Post $post) use ($users) {
-                // Each seeded post will have between 0 and 6 comments.
+                $commentsLimit = rand(0, 6);
+
                 // Using a for loop instead of the count method allows the
                 // author to vary for each comment.
-                for ($i = 0; $i < rand(0, 6); $i++) {
+                for ($i = 0; $i < $commentsLimit; $i++) {
                     // To get a more realistic set of comments, some will have
                     // the same author than the parent post
                     $usePostAuthor = (bool) rand(0, 1);

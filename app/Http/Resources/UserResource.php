@@ -24,7 +24,7 @@ class UserResource extends JsonResource
             'profilePicture' => $this->profile_picture ? Storage::disk('public')->url('/profile-pictures/'.$this->profile_picture) : null,
             'disabled' => $this->disabled,
             'organization' => new OrganizationResource($this->organization),
-            'role' => $this->role
+            'role' => $this->role->name
         ];
     }
 }

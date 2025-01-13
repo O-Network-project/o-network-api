@@ -18,7 +18,7 @@ class ReactionResource extends JsonResource
             'id' => $this->id,
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
-            'type' => $this->type,
+            'type' => $this->type->name,
             'author' => new UserResource($this->author),
             'postId' => $this->post_id
         ];
