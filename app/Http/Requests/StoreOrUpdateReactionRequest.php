@@ -25,7 +25,7 @@ class StoreOrUpdateReactionRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => ['required', 'string', 'exists:reactions_types,name'],
+            'type' => ['required', 'string', 'exists:reaction_types,name'],
         ];
     }
 
