@@ -1,9 +1,8 @@
 {
-    "name": "laravel/laravel",
+    "name": "o-network/api",
     "version": "0.5.1",
     "type": "project",
-    "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "description": "Final collaborative project at O'clock school, Tesla 2023 class. Enterprise social network built with React and Laravel. Stack: Laravel 8, PHP 7.4 et MySql 8, Redis.",
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
