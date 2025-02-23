@@ -73,6 +73,7 @@ class InvitationController extends Controller
             // If an error occurs when sending the email, the invitation should
             // be deleted: it shouldn't exist if the email failed to be sent
             $repository->delete($invitation);
+            throw $error;
         }
 
         return $invitation;
