@@ -179,11 +179,7 @@ class UserController extends Controller
         $profilePictureDeleted = array_key_exists('profile_picture', $inputs)
             && $inputs['profile_picture'] === null;
 
-        // If the user asked to remove its profile picture or he/shed sent a new
-        // one, the old picture must be deleted
-        if ($profilePictureDeleted || $request->hasFile('profilePicture')) {
-            $this->deleteProfilePicture($user->profile_picture);
-        }
+        $previousProfilePicture = $user->profile_picture;
 
         if ($request->hasFile('profilePicture')) {
             $inputs['profile_picture'] = $this->storeProfilePicture($request->file('profilePicture'));
@@ -199,6 +195,12 @@ class UserController extends Controller
             $this->deleteProfilePicture($user->profile_picture);
 
             throw $error;
+        }
+
+        // If the user asked to remove its profile picture or he/shed sent a new
+        // one, the old picture must be deleted
+        if ($profilePictureDeleted || $request->hasFile('profilePicture')) {
+            $this->deleteProfilePicture($previousProfilePicture);
         }
 
         return new UserResource($user);
