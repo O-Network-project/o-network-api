@@ -124,7 +124,7 @@ class UserController extends Controller
             // If an error occurs after the storage of the profile picture but
             // before saving the user in the database, the picture shouldn't be
             // kept in the filesystem to avoid orphan files.
-            $this->deleteProfilePicture($user);
+            $this->deleteProfilePicture($user->profile_picture);
 
             throw $error;
         }
@@ -182,7 +182,7 @@ class UserController extends Controller
         // If the user asked to remove its profile picture or he/shed sent a new
         // one, the old picture must be deleted
         if ($profilePictureDeleted || $request->hasFile('profilePicture')) {
-            $this->deleteProfilePicture($user);
+            $this->deleteProfilePicture($user->profile_picture);
         }
 
         if ($request->hasFile('profilePicture')) {
@@ -196,7 +196,7 @@ class UserController extends Controller
             // If an error occurs when updating the path of the profile picture
             // in the database, the picture shouldn't be kept in the filesystem
             // to avoid orphan files.
-            $this->deleteProfilePicture($user);
+            $this->deleteProfilePicture($user->profile_picture);
 
             throw $error;
         }
@@ -222,21 +222,20 @@ class UserController extends Controller
     }
 
     /**
-     * Delete the profile picture of a user in the
+     * Delete a profile picture in the file system from its file name in the
      * /storage/app/public/profile-pictures folder. Returns true when the
-     * suppression succeeded when the user has no profile picture to delete,
-     * else false.
+     * suppression succeeded or when the $fileName argument was empty, else
+     * false.
      *
-     * @param  \App\Models\User  $user
+     * @param  string  $fileName
      * @return bool
      */
-    protected function deleteProfilePicture(User $user)
+    protected function deleteProfilePicture(?string $fileName)
     {
-        if ($user->profile_picture === null) {
+        if (!$fileName) {
             return true;
         }
 
-        return Storage::disk('public')
-            ->delete("/profile-pictures/$user->profile_picture");
+        return Storage::disk('public')->delete("/profile-pictures/$fileName");
     }
 }
