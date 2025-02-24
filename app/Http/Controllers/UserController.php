@@ -192,7 +192,9 @@ class UserController extends Controller
             // If an error occurs when updating the path of the profile picture
             // in the database, the picture shouldn't be kept in the filesystem
             // to avoid orphan files.
-            $this->deleteProfilePicture($user->profile_picture);
+            if ($request->hasFile('profilePicture')) {
+                $this->deleteProfilePicture($user->profile_picture);
+            }
 
             throw $error;
         }
