@@ -1,6 +1,6 @@
 {
     "name": "o-network/api",
-    "version": "0.5.1",
+    "version": "0.6.0",
     "type": "project",
     "description": "Final collaborative project at O'clock school, Tesla 2023 class. Enterprise social network built with React and Laravel. Stack: Laravel 8, PHP 7.4 et MySql 8, Redis.",
     "license": "MIT",
