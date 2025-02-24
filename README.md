@@ -11,6 +11,7 @@ To run this project on your machine, you will need:
 - Composer >= 2
 - MySql or MariaDB
 - Redis (WSL required on Windows)
+- `mbstring` extension enabled in your `php.ini`
 - the SQLite driver enabled in your php.ini (for tests only)
 
 ### Procedure

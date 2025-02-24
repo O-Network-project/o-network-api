@@ -81,19 +81,11 @@ class OrganizationController extends Controller
      * case.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Organization  $organization  In case of an update, the concerned organization.
      * @return \Illuminate\Http\Response
      */
-    private function checkNameConflict(Request $request, ?Organization $organization = null)
+    private function checkNameConflict(Request $request)
     {
         $query = Organization::where('name', $request->input('name'));
-
-        // In case of an update, avoids throwing the error if the concerned
-        // organization kept the same name
-        if ($organization) {
-            $query->where('id', '!=', $organization->id);
-        }
-
         $conflicts = $query->exists();
 
         if ($conflicts) {
