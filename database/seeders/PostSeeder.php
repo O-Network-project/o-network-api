@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Classes\Helpers\ConsoleHelper;
+use App\Models\Organization;
 use App\Models\Post;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class PostSeeder extends Seeder
@@ -15,9 +16,22 @@ class PostSeeder extends Seeder
      */
     public function run()
     {
-        // Each user will have between 0 and 5 posts
-        User::all()->each(function (User $user) {
-            Post::factory()->for($user, 'author')->count(rand(0, 5))->create();
+        $volume = ConsoleHelper::promptForOption(
+            $this->command,
+            "Posts dataset volume (small: 15 per organization, large: 100 per organization)",
+            ['s' => 'small', 'l' => 'large']
+        );
+
+        $count = $volume === 'small' ? 15 : 100;
+
+        Organization::has('users')->each(function (Organization $organization) use ($count) {
+            // Using a for loop instead of the count method lets each post have
+            // a different author
+            for ($i = 0; $i < $count; $i++) {
+                Post::factory()
+                    ->for($organization->users->random(), 'author')
+                    ->create();
+            }
         });
     }
 }

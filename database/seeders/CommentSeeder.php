@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Classes\Helpers\ConsoleHelper;
 use App\Models\Comment;
 use App\Models\Organization;
 use App\Models\Post;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class CommentSeeder extends Seeder
@@ -17,13 +17,19 @@ class CommentSeeder extends Seeder
      */
     public function run()
     {
-        Organization::all()->each(function (Organization $organization) {
+        $volume = ConsoleHelper::promptForOption(
+            $this->command,
+            "Comments dataset volume (small: 0 to 6 per post, large: 0 to 100 per post)",
+            ['s' => 'small', 'l' => 'large']
+        );
+
+        Organization::all()->each(function (Organization $organization) use ($volume) {
             // Looping through the organizations allows to generate comments
             // with authors from the same organization than the posts authors
             $users = $organization->users;
 
-            $organization->posts->each(function (Post $post) use ($users) {
-                $commentsLimit = rand(0, 6);
+            $organization->posts->each(function (Post $post) use ($users, $volume) {
+                $commentsLimit = rand(0, $volume === 'small' ? 6 : 100);
 
                 // Using a for loop instead of the count method allows the
                 // author to vary for each comment.

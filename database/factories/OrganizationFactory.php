@@ -14,7 +14,7 @@ class OrganizationFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->company()
+            'name' => $this->faker->unique()->company()
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Classes\Helpers\ConsoleHelper;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Reaction;
@@ -17,12 +18,18 @@ class ReactionSeeder extends Seeder
      */
     public function run()
     {
-        Organization::all()->each(function (Organization $organization) {
+        $volume = ConsoleHelper::promptForOption(
+            $this->command,
+            "Reaction dataset volume (small: 0 to 15 per post, large: 0 to maximum per post)",
+            ['s' => 'small', 'l' => 'large']
+        );
+
+        Organization::all()->each(function (Organization $organization) use ($volume) {
             // Looping through the organizations allows to generate reactions
             // with authors from the same organization than the posts authors
             $users = $organization->users;
 
-            $organization->posts->each(function (Post $post) use ($users) {
+            $organization->posts->each(function (Post $post) use ($users, $volume) {
                 $possibleReactors = $users->reject(function (User $user) use ($post) {
                     return (
                         // To get a more realistic set of reactions, none will
@@ -34,7 +41,10 @@ class ReactionSeeder extends Seeder
                     );
                 });
 
-                $reactionsLimit = rand(0, $possibleReactors->count());
+                $reactionsLimit = rand(0, $volume === 'small'
+                    ? min($possibleReactors->count(), 15)
+                    : $possibleReactors->count()
+                );
 
                 // Using a for loop instead of the count method allows the
                 // author to vary for each reaction.
