@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ReactionFactory extends Factory
 {
+    protected static $typeIds;
+
     /**
      * Define the model's default state.
      *
@@ -14,10 +16,12 @@ class ReactionFactory extends Factory
      */
     public function definition()
     {
-        $types = ReactionType::all();
+        if (!isset(static::$typeIds)) {
+            static::$typeIds = ReactionType::pluck('id')->all();
+        }
 
         return [
-            'type_id' => $this->faker->randomElement($types)
+            'type_id' => $this->faker->randomElement(static::$typeIds)
         ];
     }
 }
