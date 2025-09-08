@@ -7,6 +7,7 @@ use App\Models\Comment;
 use App\Models\Organization;
 use App\Models\Post;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 class CommentSeeder extends Seeder
 {
@@ -23,12 +24,15 @@ class CommentSeeder extends Seeder
             ['s' => 'small', 'l' => 'large']
         );
 
-        Organization::all()->each(function (Organization $organization) use ($volume) {
+        $comments = collect();
+        $factory = Comment::factory();
+
+        Organization::all()->each(function (Organization $organization) use ($volume, $comments, $factory) {
             // Looping through the organizations allows to generate comments
             // with authors from the same organization than the posts authors
             $users = $organization->users;
 
-            $organization->posts->each(function (Post $post) use ($users, $volume) {
+            $organization->posts->each(function (Post $post) use ($users, $volume, $comments, $factory) {
                 $commentsLimit = rand(0, $volume === 'small' ? 6 : 100);
 
                 // Using a for loop instead of the count method allows the
@@ -39,12 +43,17 @@ class CommentSeeder extends Seeder
                     $usePostAuthor = (bool) rand(0, 1);
                     $author = $usePostAuthor ? $post->author : $users->random();
 
-                    Comment::factory()
+                    $comments->push($factory
                         ->for($post)
                         ->for($author, 'author')
-                        ->create();
+                        ->make()
+                    );
                 }
             });
+        });
+
+        $comments->chunk(1000)->each(function (Collection $commentsChunk) {
+            Comment::insert($commentsChunk->toArray());
         });
     }
 }

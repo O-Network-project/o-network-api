@@ -6,6 +6,7 @@ use App\Classes\Helpers\ConsoleHelper;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 class UserSeeder extends Seeder
 {
@@ -22,6 +23,7 @@ class UserSeeder extends Seeder
             ['s' => 'small', 'l' => 'large']
         );
 
+        $users = collect();
         $factory = User::factory();
 
         // Fetching sample users from the randomuser.me API is slow, so it's
@@ -38,18 +40,29 @@ class UserSeeder extends Seeder
 
         // Each seeded organization (except the last one, check the above
         // comment) will have 1 admin and 10 members
-        $organizations->each(function (Organization $organization) use ($volume, $factory) {
+        $organizations->each(function (Organization $organization) use ($volume, $users, $factory) {
             // The below conditions allows the UserSeeder to be launched
             // multiple times without ending with multiple admins, as only 1
             // admin should exist in each organization
             if ($organization->users->where('role_id', 2)->count() === 0) {
-                $factory->admin()->for($organization)->create();
+                $users->push($factory
+                    ->admin()
+                    ->for($organization)
+                    ->make()
+                    ->makeVisible('password')
+                );
             }
 
-            $factory
+            $users->push(...$factory
                 ->for($organization)
                 ->count($volume === 'small' ? 9 : 299)
-                ->create();
+                ->make()
+                ->makeVisible('password')
+            );
+        });
+
+        $users->chunk(1000)->each(function (Collection $usersChunk) {
+            User::insert($usersChunk->toArray());
         });
     }
 }

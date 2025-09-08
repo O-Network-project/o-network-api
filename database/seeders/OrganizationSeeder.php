@@ -21,8 +21,10 @@ class OrganizationSeeder extends Seeder
             ['s' => 'small', 'l' => 'large']
         );
 
-        Organization::factory()
+        Organization::insert(Organization::factory()
             ->count($volume === 'small' ? 3 : 100)
-            ->create();
+            ->make()
+            ->toArray()
+        );
     }
 }

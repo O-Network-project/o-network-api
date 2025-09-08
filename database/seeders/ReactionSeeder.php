@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Reaction;
 use App\Models\Organization;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 class ReactionSeeder extends Seeder
 {
@@ -24,10 +25,13 @@ class ReactionSeeder extends Seeder
             ['s' => 'small', 'l' => 'large']
         );
 
+        $reactions = collect();
+        $factory = Reaction::factory();
+
         // Looping through the organizations allows to generate reactions
         // with authors from the same organization than the posts authors
-        Organization::all()->each(function (Organization $organization) use ($volume) {
-            $organization->posts->each(function (Post $post) use ($organization, $volume) {
+        Organization::all()->each(function (Organization $organization) use ($volume, $reactions, $factory) {
+            $organization->posts->each(function (Post $post) use ($organization, $volume, $reactions, $factory) {
                 // Users can only react once to a single post
                 $possibleReactors = $organization->users
                     ->except($post->reactionAuthors->pluck('id')->toArray())
@@ -47,10 +51,11 @@ class ReactionSeeder extends Seeder
                 for ($i = 0; $i < $reactionsLimit; $i++) {
                     $author = $possibleReactors->random();
 
-                    Reaction::factory()
+                    $reactions->push($factory
                         ->for($post)
                         ->for($author, 'author')
-                        ->create();
+                        ->make()
+                    );
 
                     // Each user can only add one reaction per post; after the
                     // adding, the author must not be used again for the current
@@ -58,6 +63,10 @@ class ReactionSeeder extends Seeder
                     $possibleReactors->forget($author->id);
                 }
             });
+        });
+
+        $reactions->chunk(1000)->each(function (Collection $reactionsChunk) {
+            Reaction::insert($reactionsChunk->toArray());
         });
     }
 }

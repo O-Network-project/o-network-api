@@ -6,6 +6,7 @@ use App\Classes\Helpers\ConsoleHelper;
 use App\Models\Organization;
 use App\Models\Post;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 class PostSeeder extends Seeder
 {
@@ -24,14 +25,22 @@ class PostSeeder extends Seeder
 
         $count = $volume === 'small' ? 15 : 100;
 
-        Organization::has('users')->each(function (Organization $organization) use ($count) {
+        $posts = collect();
+        $factory = Post::factory();
+
+        Organization::has('users')->each(function (Organization $organization) use ($count, $posts, $factory) {
             // Using a for loop instead of the count method lets each post have
             // a different author
             for ($i = 0; $i < $count; $i++) {
-                Post::factory()
+                $posts->push($factory
                     ->for($organization->users->random(), 'author')
-                    ->create();
+                    ->make()
+                );
             }
+        });
+
+        $posts->chunk(1000)->each(function (Collection $postsChunk) {
+            Post::insert($postsChunk->toArray());
         });
     }
 }
