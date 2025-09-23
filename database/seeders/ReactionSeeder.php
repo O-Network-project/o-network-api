@@ -39,7 +39,7 @@ class ReactionSeeder extends Seeder
 
                 // To get a more realistic set of reactions, none will have the
                 // same author as the parent post
-                $possibleReactors->forget($post->author->id);
+                $possibleReactors->forget($post->author_id);
 
                 $reactionsLimit = rand(0, $volume === 'small'
                     ? min($possibleReactors->count(), 15)
