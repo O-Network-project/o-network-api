@@ -32,7 +32,7 @@ class UserSeeder extends Seeder
             $factory = $factory->fromRandomUserMeApi();
         }
 
-        $organizations = Organization::all();
+        $organizations = Organization::select('id')->get();
 
         // The last organization won't be filled with users, to be able to test
         // the creation of the admin (automatically the first user)

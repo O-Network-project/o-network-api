@@ -28,9 +28,18 @@ class ReactionSeeder extends Seeder
         $reactions = collect();
         $factory = Reaction::factory();
 
+        $organizations = Organization::has('posts')
+            ->select('id')
+            ->with([
+                'posts:posts.id,posts.author_id',
+                'posts.reactionAuthors:users.id,reactions.author_id',
+                'users:id,organization_id'
+            ])
+            ->get();
+
         // Looping through the organizations allows to generate reactions
         // with authors from the same organization than the posts authors
-        Organization::all()->each(function (Organization $organization) use ($volume, $reactions, $factory) {
+        $organizations->each(function (Organization $organization) use ($volume, $reactions, $factory) {
             $organization->posts->each(function (Post $post) use ($organization, $volume, $reactions, $factory) {
                 // Users can only react once to a single post
                 $possibleReactors = $organization->users

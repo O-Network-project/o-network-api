@@ -27,12 +27,19 @@ class CommentSeeder extends Seeder
         $comments = collect();
         $factory = Comment::factory();
 
-        Organization::all()->each(function (Organization $organization) use ($volume, $comments, $factory) {
-            // Looping through the organizations allows to generate comments
-            // with authors from the same organization than the posts authors
-            $users = $organization->users;
+        $organizations = Organization::has('posts')
+            ->select('id')
+            ->with([
+                'users:id,organization_id',
+                'posts:posts.id,posts.author_id',
+                'posts.author:users.id'
+            ])
+            ->get();
 
-            $organization->posts->each(function (Post $post) use ($users, $volume, $comments, $factory) {
+        // Looping through the organizations allows to generate comments with
+        // authors from the same organization than the posts authors
+        $organizations->each(function (Organization $organization) use ($volume, $comments, $factory) {
+            $organization->posts->each(function (Post $post) use ($organization, $volume, $comments, $factory) {
                 $commentsLimit = rand(0, $volume === 'small' ? 6 : 100);
 
                 // Using a for loop instead of the count method allows the
@@ -41,7 +48,7 @@ class CommentSeeder extends Seeder
                     // To get a more realistic set of comments, some will have
                     // the same author than the parent post
                     $usePostAuthor = (bool) rand(0, 1);
-                    $author = $usePostAuthor ? $post->author : $users->random();
+                    $author = $usePostAuthor ? $post->author : $organization->users->random();
 
                     $comments->push($factory
                         ->for($post)

@@ -28,7 +28,12 @@ class PostSeeder extends Seeder
         $posts = collect();
         $factory = Post::factory();
 
-        Organization::has('users')->each(function (Organization $organization) use ($count, $posts, $factory) {
+        $organizations = Organization::has('users')
+            ->select('id')
+            ->with('users:id,organization_id')
+            ->get();
+
+        $organizations->each(function (Organization $organization) use ($count, $posts, $factory) {
             // Using a for loop instead of the count method lets each post have
             // a different author
             for ($i = 0; $i < $count; $i++) {
