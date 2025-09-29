@@ -31,8 +31,7 @@ class CommentSeeder extends Seeder
             ->select('id')
             ->with([
                 'users:id,organization_id',
-                'posts:posts.id,posts.author_id',
-                'posts.author:users.id'
+                'posts:posts.id,posts.author_id'
             ])
             ->get();
 
@@ -40,22 +39,21 @@ class CommentSeeder extends Seeder
         // authors from the same organization than the posts authors
         $organizations->each(function (Organization $organization) use ($volume, $comments, $factory) {
             $organization->posts->each(function (Post $post) use ($organization, $volume, $comments, $factory) {
-                $commentsLimit = rand(0, $volume === 'small' ? 6 : 100);
+                $comments->push(...$factory
+                    ->count(rand(0, $volume === 'small' ? 6 : 100))
+                    ->state(function () use ($post, $organization) {
+                        // To get a more realistic set of comments, some will
+                        // have the same author than the parent post
+                        $usePostAuthor = (bool) rand(0, 1);
 
-                // Using a for loop instead of the count method allows the
-                // author to vary for each comment.
-                for ($i = 0; $i < $commentsLimit; $i++) {
-                    // To get a more realistic set of comments, some will have
-                    // the same author than the parent post
-                    $usePostAuthor = (bool) rand(0, 1);
-                    $author = $usePostAuthor ? $post->author : $organization->users->random();
-
-                    $comments->push($factory
-                        ->for($post)
-                        ->for($author, 'author')
-                        ->make()
-                    );
-                }
+                        return [
+                            'author_id' => $usePostAuthor
+                                ? $post->author_id
+                                : $organization->users->random()->id
+                        ];
+                    })
+                    ->make(['post_id' => $post->id])
+                );
             });
         });
 

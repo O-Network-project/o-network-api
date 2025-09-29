@@ -23,8 +23,6 @@ class PostSeeder extends Seeder
             ['s' => 'small', 'l' => 'large']
         );
 
-        $count = $volume === 'small' ? 15 : 100;
-
         $posts = collect();
         $factory = Post::factory();
 
@@ -33,15 +31,14 @@ class PostSeeder extends Seeder
             ->with('users:id,organization_id')
             ->get();
 
-        $organizations->each(function (Organization $organization) use ($count, $posts, $factory) {
-            // Using a for loop instead of the count method lets each post have
-            // a different author
-            for ($i = 0; $i < $count; $i++) {
-                $posts->push($factory
-                    ->for($organization->users->random(), 'author')
-                    ->make()
-                );
-            }
+        $organizations->each(function (Organization $organization) use ($volume, $posts, $factory) {
+            $posts->push(...$factory
+                ->count($volume === 'small' ? 15 : 100)
+                ->state(function () use ($organization) {
+                    return ['author_id' => $organization->users->random()->id];
+                })
+                ->make()
+            );
         });
 
         $posts->chunk(1000)->each(function (Collection $postsChunk) {

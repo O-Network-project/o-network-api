@@ -50,27 +50,23 @@ class ReactionSeeder extends Seeder
                 // same author as the parent post
                 $possibleReactors->forget($post->author_id);
 
-                $reactionsLimit = rand(0, $volume === 'small'
-                    ? min($possibleReactors->count(), 15)
-                    : $possibleReactors->count()
+                $reactions->push(...$factory
+                    ->count(rand(0, $volume === 'small'
+                        ? min($possibleReactors->count(), 15)
+                        : $possibleReactors->count()
+                    ))
+                    ->state(function () use ($possibleReactors) {
+                        $author = $possibleReactors->random();
+
+                        // Each user can only react once per post, so the author
+                        // of a reaction must not be selected again on the same
+                        // post.
+                        $possibleReactors->forget($author->id);
+
+                        return ['author_id' => $author->id];
+                    })
+                    ->make(['post_id' => $post->id])
                 );
-
-                // Using a for loop instead of the count method allows the
-                // author to vary for each reaction.
-                for ($i = 0; $i < $reactionsLimit; $i++) {
-                    $author = $possibleReactors->random();
-
-                    $reactions->push($factory
-                        ->for($post)
-                        ->for($author, 'author')
-                        ->make()
-                    );
-
-                    // Each user can only add one reaction per post; after the
-                    // adding, the author must not be used again for the current
-                    // post.
-                    $possibleReactors->forget($author->id);
-                }
             });
         });
 

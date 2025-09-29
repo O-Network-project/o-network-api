@@ -51,16 +51,14 @@ class UserSeeder extends Seeder
             if (!$organizationWithAdminIds->contains($organization->id)) {
                 $users->push($factory
                     ->admin()
-                    ->for($organization)
-                    ->make()
+                    ->make(['organization_id' => $organization->id])
                     ->makeVisible('password')
                 );
             }
 
             $users->push(...$factory
-                ->for($organization)
                 ->count($volume === 'small' ? 9 : 299)
-                ->make()
+                ->make(['organization_id' => $organization->id])
                 ->makeVisible('password')
             );
         });
