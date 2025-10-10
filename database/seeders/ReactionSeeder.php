@@ -2,11 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Classes\Helpers\ConsoleHelper;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Reaction;
 use App\Models\Organization;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 class ReactionSeeder extends Seeder
 {
@@ -17,43 +19,59 @@ class ReactionSeeder extends Seeder
      */
     public function run()
     {
-        Organization::all()->each(function (Organization $organization) {
-            // Looping through the organizations allows to generate reactions
-            // with authors from the same organization than the posts authors
-            $users = $organization->users;
+        $volume = ConsoleHelper::promptForOption(
+            $this->command,
+            "Reaction dataset volume (small: 0 to 15 per post, large: 0 to maximum per post)",
+            ['s' => 'small', 'l' => 'large']
+        );
 
-            $organization->posts->each(function (Post $post) use ($users) {
-                $possibleReactors = $users->reject(function (User $user) use ($post) {
-                    return (
-                        // To get a more realistic set of reactions, none will
-                        // have the same author as the parent post
-                        $user->id === $post->author->id
+        $reactions = collect();
+        $factory = Reaction::factory();
 
-                        // Users can only react once to a single post
-                        || $post->reactionAuthors->contains($user)
-                    );
-                });
+        $organizations = Organization::has('posts')
+            ->select('id')
+            ->with([
+                'posts:posts.id,posts.author_id',
+                'posts.reactionAuthors:users.id,reactions.author_id',
+                'users:id,organization_id'
+            ])
+            ->get();
 
-                $reactionsLimit = rand(0, $possibleReactors->count());
+        // Looping through the organizations allows to generate reactions
+        // with authors from the same organization than the posts authors
+        $organizations->each(function (Organization $organization) use ($volume, $reactions, $factory) {
+            $organization->posts->each(function (Post $post) use ($organization, $volume, $reactions, $factory) {
+                // Users can only react once to a single post
+                $possibleReactors = $organization->users
+                    ->except($post->reactionAuthors->pluck('id')->toArray())
+                    ->keyBy('id');
 
-                // Using a for loop instead of the count method allows the
-                // author to vary for each reaction.
-                for ($i = 0; $i < $reactionsLimit; $i++) {
-                    $author = $possibleReactors->random();
+                // To get a more realistic set of reactions, none will have the
+                // same author as the parent post
+                $possibleReactors->forget($post->author_id);
 
-                    Reaction::factory()
-                        ->for($post)
-                        ->for($author, 'author')
-                        ->create();
+                $reactions->push(...$factory
+                    ->count(rand(0, $volume === 'small'
+                        ? min($possibleReactors->count(), 15)
+                        : $possibleReactors->count()
+                    ))
+                    ->state(function () use ($possibleReactors) {
+                        $author = $possibleReactors->random();
 
-                    // Each user can only add one reaction per post; after the
-                    // adding, the author must not be used again for the current
-                    // post.
-                    $possibleReactors = $possibleReactors->reject(function (User $user) use ($author) {
-                        return $user->id === $author->id;
-                    });
-                }
+                        // Each user can only react once per post, so the author
+                        // of a reaction must not be selected again on the same
+                        // post.
+                        $possibleReactors->forget($author->id);
+
+                        return ['author_id' => $author->id];
+                    })
+                    ->make(['post_id' => $post->id])
+                );
             });
+        });
+
+        $reactions->chunk(1000)->each(function (Collection $reactionsChunk) {
+            Reaction::insert($reactionsChunk->toArray());
         });
     }
 }

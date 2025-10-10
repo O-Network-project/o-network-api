@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Classes\Helpers\ConsoleHelper;
+use App\Models\Organization;
 use App\Models\Post;
-use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 class PostSeeder extends Seeder
 {
@@ -15,9 +17,32 @@ class PostSeeder extends Seeder
      */
     public function run()
     {
-        // Each user will have between 0 and 5 posts
-        User::all()->each(function (User $user) {
-            Post::factory()->for($user, 'author')->count(rand(0, 5))->create();
+        $volume = ConsoleHelper::promptForOption(
+            $this->command,
+            "Posts dataset volume (small: 15 per organization, large: 100 per organization)",
+            ['s' => 'small', 'l' => 'large']
+        );
+
+        $posts = collect();
+        $factory = Post::factory();
+
+        $organizations = Organization::has('users')
+            ->select('id')
+            ->with('users:id,organization_id')
+            ->get();
+
+        $organizations->each(function (Organization $organization) use ($volume, $posts, $factory) {
+            $posts->push(...$factory
+                ->count($volume === 'small' ? 15 : 100)
+                ->state(function () use ($organization) {
+                    return ['author_id' => $organization->users->random()->id];
+                })
+                ->make()
+            );
+        });
+
+        $posts->chunk(1000)->each(function (Collection $postsChunk) {
+            Post::insert($postsChunk->toArray());
         });
     }
 }

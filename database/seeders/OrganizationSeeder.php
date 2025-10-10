@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Classes\Helpers\ConsoleHelper;
 use App\Models\Organization;
 use Illuminate\Database\Seeder;
 
@@ -14,8 +15,16 @@ class OrganizationSeeder extends Seeder
      */
     public function run()
     {
-        Organization::factory()
-            ->count(3)
-            ->create();
+        $volume = ConsoleHelper::promptForOption(
+            $this->command,
+            "Organizations dataset volume (small: 3, large: 100)",
+            ['s' => 'small', 'l' => 'large']
+        );
+
+        Organization::insert(Organization::factory()
+            ->count($volume === 'small' ? 3 : 100)
+            ->make()
+            ->toArray()
+        );
     }
 }

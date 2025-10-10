@@ -23,7 +23,8 @@ class CreateUsersTable extends Migration
             $table->string('job');
             $table->string('profile_picture', 70)->nullable();
             $table->boolean('disabled')->default(false);
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
 
             $table->foreignId('organization_id')
                 ->constrained()
