@@ -9,7 +9,7 @@ To run this project on your machine, you will need:
 - Git
 - PHP >= 7.0
 - Composer >= 2
-- MySql or MariaDB
+- MySql or MariaDB (with default timezone set to `UTC` or `+00:00`)
 - Redis (WSL required on Windows)
 - `mbstring` extension enabled in your `php.ini`
 - the SQLite driver enabled in your php.ini (for tests only)
