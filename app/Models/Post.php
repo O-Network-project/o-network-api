@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Post extends Model
 {
@@ -36,6 +37,11 @@ class Post extends Model
     public function reactions()
     {
         return $this->hasMany(Reaction::class);
+    }
+
+    public function currentUserReaction()
+    {
+        return $this->hasOne(Reaction::class)->where('author_id', Auth::user()->id);
     }
 
     public function reactionAuthors()
