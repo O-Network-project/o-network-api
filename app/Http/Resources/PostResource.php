@@ -20,7 +20,6 @@ class PostResource extends JsonResource
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
             'author' => new UserResource($this->author),
-            'reactions' => new ReactionCollection($this->reactions),
             'currentUserReaction' => new ReactionResource($this->currentUserReaction),
             'reactionsCounter' => $this->getReactionsCounter(),
             'commentsCount' => $this->comments->count()
