@@ -21,12 +21,12 @@ class PostResource extends JsonResource
             'updatedAt' => $this->updated_at,
             'author' => new UserResource($this->author),
             'currentUserReaction' => new ReactionResource($this->currentUserReaction),
-            'reactionsCounter' => $this->getReactionsCounter(),
+            'reactionTypeCounts' => $this->getReactionTypeCounts(),
             'commentsCount' => $this->comments->count()
         ];
     }
 
-    protected function getReactionsCounter()
+    protected function getReactionTypeCounts()
     {
         return $this->reactions()
             ->join('reaction_types', 'reactions.type_id', 'reaction_types.id')
